@@ -12,7 +12,6 @@ final class GoogleDriveService: CloudFileStore {
     var usesSimulation: Bool { !CloudConfig.Google.isConfigured }
 
     private let tokenAccount = "google.oauth"
-    private let oauth = OAuthSession()
 
     func connect(from presenter: UIViewController) async throws -> CloudAccount {
         if usesSimulation {
@@ -191,6 +190,7 @@ final class GoogleDriveService: CloudFileStore {
             "prompt": "consent"
         ]
         let url = URL(string: "https://accounts.google.com/o/oauth2/v2/auth?\(CloudHTTP.queryItems(items))")!
+        let oauth = OAuthSession()
         let callback = try await oauth.signIn(authURL: url, callbackScheme: CloudConfig.Google.urlScheme)
         let code = URLComponents(url: callback, resolvingAgainstBaseURL: false)?
             .queryItems?.first(where: { $0.name == "code" })?.value
