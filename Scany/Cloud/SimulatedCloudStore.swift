@@ -9,7 +9,7 @@ final class SimulatedCloudStore: CloudFileStore {
 
     private let fileManager = FileManager.default
 
-    init(provider: CloudProvider) {
+    nonisolated init(provider: CloudProvider) {
         self.provider = provider
     }
 

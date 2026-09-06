@@ -16,17 +16,15 @@ final class CloudManager: ObservableObject {
     @Published var lastUsedProvider: CloudProvider?
     @Published var statusMessage: String?
 
-    private let googleLive: GoogleDriveService
-    private let oneDriveLive: OneDriveService
-    private let googleSim: SimulatedCloudStore
-    private let oneDriveSim: SimulatedCloudStore
+    // Service inits are explicitly `nonisolated`, so these defaults are safe
+    // even when CloudManager's initializer is still in its nonisolated phase
+    // (Swift 6 / default MainActor isolation).
+    private let googleLive = GoogleDriveService()
+    private let oneDriveLive = OneDriveService()
+    private let googleSim = SimulatedCloudStore(provider: .googleDrive)
+    private let oneDriveSim = SimulatedCloudStore(provider: .oneDrive)
 
     init() {
-        googleLive = GoogleDriveService()
-        oneDriveLive = OneDriveService()
-        googleSim = SimulatedCloudStore(provider: .googleDrive)
-        oneDriveSim = SimulatedCloudStore(provider: .oneDrive)
-
         let saved = CloudDestinationStore.load()
         lastUsedProvider = saved.lastProvider
         if let entry = saved.google {

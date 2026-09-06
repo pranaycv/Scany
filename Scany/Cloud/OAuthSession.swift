@@ -5,9 +5,26 @@ import UIKit
 
 /// PKCE OAuth 2.0 via `ASWebAuthenticationSession`. Used when official SDKs
 /// are not linked, or as a fallback if Sign-In / MSAL is unavailable.
+///
+/// The type is MainActor-isolated because `ASWebAuthenticationSession` must be
+/// started from the main thread. Construction is MainActor-only (`make()` /
+/// `signIn(authURL:callbackScheme:)`); do not allocate this from a service
+/// stored-property default or a `nonisolated init`.
 @MainActor
 final class OAuthSession: NSObject, ASWebAuthenticationPresentationContextProviding {
     private var session: ASWebAuthenticationSession?
+
+    private override init() {
+        super.init()
+    }
+
+    static func make() -> OAuthSession {
+        OAuthSession()
+    }
+
+    static func signIn(authURL: URL, callbackScheme: String) async throws -> URL {
+        try await make().signIn(authURL: authURL, callbackScheme: callbackScheme)
+    }
 
     func signIn(
         authURL: URL,

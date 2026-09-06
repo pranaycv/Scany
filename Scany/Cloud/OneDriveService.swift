@@ -7,16 +7,28 @@ import MSAL
 
 /// OneDrive uploads via Microsoft Graph.
 /// Auth prefers MSAL (SPM) and falls back to PKCE + Keychain tokens.
+///
+/// Init stays `nonisolated` so default MainActor isolation / approachable
+/// concurrency cannot leak onto `OneDriveService()`. CloudManager (and any
+/// other caller) can construct this from a stored-property default or from the
+/// nonisolated phase of another type's initializer.
 final class OneDriveService: CloudFileStore {
-    let provider: CloudProvider = .oneDrive
+    let provider: CloudProvider
     var usesSimulation: Bool { !CloudConfig.OneDrive.isConfigured }
 
-    private let tokenAccount = "onedrive.oauth"
+    private let tokenAccount: String
 
     #if canImport(MSAL)
     private var application: MSALPublicClientApplication?
     private var cachedAccount: MSALAccount?
     #endif
+
+    /// Sendable stored state only — safe to run off the main actor, including
+    /// from CloudManager's property defaults and the nonisolated phase of init.
+    nonisolated init() {
+        provider = .oneDrive
+        tokenAccount = "onedrive.oauth"
+    }
 
     func connect(from presenter: UIViewController) async throws -> CloudAccount {
         if usesSimulation {
@@ -208,8 +220,7 @@ final class OneDriveService: CloudFileStore {
         let url = URL(
             string: "https://login.microsoftonline.com/\(CloudConfig.OneDrive.tenantID)/oauth2/v2.0/authorize?\(CloudHTTP.queryItems(items))"
         )!
-        let oauth = OAuthSession()
-        let callback = try await oauth.signIn(authURL: url, callbackScheme: CloudConfig.OneDrive.urlScheme)
+        let callback = try await OAuthSession.signIn(authURL: url, callbackScheme: CloudConfig.OneDrive.urlScheme)
         let code = URLComponents(url: callback, resolvingAgainstBaseURL: false)?
             .queryItems?.first(where: { $0.name == "code" })?.value
         guard let code else { throw CloudError.message("Microsoft did not return an auth code.") }
