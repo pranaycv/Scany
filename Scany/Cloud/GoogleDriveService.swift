@@ -7,11 +7,23 @@ import GoogleSignIn
 
 /// Google Drive uploads via Drive API v3.
 /// Auth prefers Google Sign-In (SPM) and falls back to PKCE + Keychain tokens.
+///
+/// Init stays `nonisolated` so default MainActor isolation / approachable
+/// concurrency cannot leak onto `GoogleDriveService()`. CloudManager (and any
+/// other caller) can construct this from a stored-property default or from the
+/// nonisolated phase of another type's initializer.
 final class GoogleDriveService: CloudFileStore {
-    let provider: CloudProvider = .googleDrive
+    let provider: CloudProvider
     var usesSimulation: Bool { !CloudConfig.Google.isConfigured }
 
-    private let tokenAccount = "google.oauth"
+    private let tokenAccount: String
+
+    /// Sendable stored state only — safe to run off the main actor, including
+    /// from CloudManager's property defaults and the nonisolated phase of init.
+    nonisolated init() {
+        provider = .googleDrive
+        tokenAccount = "google.oauth"
+    }
 
     func connect(from presenter: UIViewController) async throws -> CloudAccount {
         if usesSimulation {
@@ -190,8 +202,7 @@ final class GoogleDriveService: CloudFileStore {
             "prompt": "consent"
         ]
         let url = URL(string: "https://accounts.google.com/o/oauth2/v2/auth?\(CloudHTTP.queryItems(items))")!
-        let oauth = OAuthSession()
-        let callback = try await oauth.signIn(authURL: url, callbackScheme: CloudConfig.Google.urlScheme)
+        let callback = try await OAuthSession.signIn(authURL: url, callbackScheme: CloudConfig.Google.urlScheme)
         let code = URLComponents(url: callback, resolvingAgainstBaseURL: false)?
             .queryItems?.first(where: { $0.name == "code" })?.value
         guard let code else { throw CloudError.message("Google did not return an auth code.") }
