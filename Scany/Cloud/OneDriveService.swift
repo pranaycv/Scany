@@ -236,9 +236,9 @@ final class OneDriveService: CloudFileStore {
         return try tokens(from: data)
     }
 
-    private func refreshed(_ tokens: OAuthTokens) async throws -> OAuthTokens {
-        if !tokens.isExpired { return tokens }
-        guard let refresh = tokens.refreshToken else { throw CloudError.notSignedIn }
+    private func refreshed(_ current: OAuthTokens) async throws -> OAuthTokens {
+        if !current.isExpired { return current }
+        guard let refresh = current.refreshToken else { throw CloudError.notSignedIn }
         var request = URLRequest(
             url: URL(string: "https://login.microsoftonline.com/\(CloudConfig.OneDrive.tenantID)/oauth2/v2.0/token")!
         )
