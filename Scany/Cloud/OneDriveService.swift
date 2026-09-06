@@ -12,7 +12,6 @@ final class OneDriveService: CloudFileStore {
     var usesSimulation: Bool { !CloudConfig.OneDrive.isConfigured }
 
     private let tokenAccount = "onedrive.oauth"
-    private let oauth = OAuthSession()
 
     #if canImport(MSAL)
     private var application: MSALPublicClientApplication?
@@ -209,6 +208,7 @@ final class OneDriveService: CloudFileStore {
         let url = URL(
             string: "https://login.microsoftonline.com/\(CloudConfig.OneDrive.tenantID)/oauth2/v2.0/authorize?\(CloudHTTP.queryItems(items))"
         )!
+        let oauth = OAuthSession()
         let callback = try await oauth.signIn(authURL: url, callbackScheme: CloudConfig.OneDrive.urlScheme)
         let code = URLComponents(url: callback, resolvingAgainstBaseURL: false)?
             .queryItems?.first(where: { $0.name == "code" })?.value
