@@ -180,7 +180,7 @@ struct ScanSessionView: View {
                     }
                     .padding(.horizontal, 16)
                 }
-                .onChange(of: model.document.pages.count) { _, _ in
+                .scanyOnChange(of: model.document.pages.count) { _ in
                     if let last = model.document.pages.last {
                         withAnimation { proxy.scrollTo(last.id, anchor: .trailing) }
                     }

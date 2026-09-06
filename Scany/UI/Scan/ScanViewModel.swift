@@ -39,9 +39,9 @@ final class ScanViewModel: ObservableObject {
     var overlayColor: UIColor {
         switch guidance {
         case .capturing, .captured:
-            return UIColor(ScanyTheme.accent)
+            return ScanyTheme.accentUIColor
         case .holdSteady:
-            return UIColor(ScanyTheme.overlaySettling)
+            return ScanyTheme.overlaySettlingUIColor
         case .searching, .moveCloser, .lowLight, .tooBlurry:
             return UIColor.white
         default:

@@ -12,8 +12,15 @@ struct ReviewView: View {
     @State private var selectedPageID: UUID?
     @State private var showShare = false
 
+    private var isPagePresented: Binding<Bool> {
+        Binding(
+            get: { selectedPageID != nil },
+            set: { if !$0 { selectedPageID = nil } }
+        )
+    }
+
     var body: some View {
-        NavigationStack {
+        navigationContainer {
             ZStack {
                 ScanyTheme.ink.ignoresSafeArea()
 
@@ -25,20 +32,19 @@ struct ReviewView: View {
             }
             .navigationTitle(model.document.title)
             .navigationBarTitleDisplayMode(.inline)
-            .toolbarBackground(.visible, for: .navigationBar)
-            .toolbarColorScheme(.dark, for: .navigationBar)
+            .scanyToolbarChrome()
             .toolbar {
-                ToolbarItem(placement: .topBarLeading) {
+                ToolbarItem(placement: .navigationBarLeading) {
                     Button("Home", action: onHome)
                 }
-                ToolbarItem(placement: .topBarTrailing) {
+                ToolbarItem(placement: .navigationBarTrailing) {
                     EditButton()
                         .disabled(model.document.pages.isEmpty)
                 }
             }
             .safeAreaInset(edge: .bottom) { bottomActions }
             .sheet(isPresented: $showShare) {
-                if let exportURL {
+                if let exportURL = exportURL {
                     ActivityShareSheet(items: [exportURL])
                 }
             }
@@ -50,11 +56,45 @@ struct ReviewView: View {
             } message: {
                 Text(exportError ?? "")
             }
-            .navigationDestination(item: $selectedPageID) { id in
-                if let page = model.document.pages.first(where: { $0.id == id }) {
-                    PagePreviewView(page: page, enhanced: model.document.autoEnhanceAllPages)
-                }
+            .background(ios15PushLink)
+            .scanyNavigationDestination(isPresented: isPagePresented) {
+                pagePreview
             }
+        }
+    }
+
+    @ViewBuilder
+    private func navigationContainer<Content: View>(@ViewBuilder content: () -> Content) -> some View {
+        if #available(iOS 16.0, *) {
+            NavigationStack { content() }
+        } else {
+            NavigationView { content() }
+                .navigationViewStyle(.stack)
+        }
+    }
+
+    /// `NavigationLink(isActive:)` is the iOS 15 push path. iOS 16+ uses
+    /// `navigationDestination(isPresented:)` instead.
+    @ViewBuilder
+    private var ios15PushLink: some View {
+        if #available(iOS 16.0, *) {
+            EmptyView()
+        } else {
+            NavigationLink(destination: pagePreview, isActive: isPagePresented) {
+                EmptyView()
+            }
+            .hidden()
+        }
+    }
+
+    @ViewBuilder
+    private var pagePreview: some View {
+        if let id = selectedPageID,
+           let page = model.document.pages.first(where: { $0.id == id }) {
+            PagePreviewView(page: page, enhanced: model.document.autoEnhanceAllPages)
+        } else {
+            Text("Page unavailable")
+                .foregroundStyle(.white)
         }
     }
 
@@ -117,7 +157,7 @@ struct ReviewView: View {
                 .onMove(perform: model.movePages)
             }
         }
-        .scrollContentBackground(.hidden)
+        .scanyHideListBackground()
         .listStyle(.insetGrouped)
     }
 
@@ -249,6 +289,6 @@ struct PagePreviewView: View {
         }
         .navigationTitle("Page")
         .navigationBarTitleDisplayMode(.inline)
-        .toolbarColorScheme(.dark, for: .navigationBar)
+        .scanyToolbarChrome()
     }
 }

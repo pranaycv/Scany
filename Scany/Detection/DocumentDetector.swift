@@ -3,8 +3,11 @@ import Foundation
 import Vision
 
 /// Detects a document page quadrilateral with Vision.
-/// Primary path: `VNDetectDocumentSegmentationRequest`.
-/// Fallback: `VNDetectRectanglesRequest` tuned for paper-like aspect ratios.
+///
+/// Primary path: `VNDetectDocumentSegmentationRequest` (shipped in iOS 15,
+/// which is this app's deployment floor and the reason we do not go lower).
+/// If segmentation returns no usable quad, we fall back to
+/// `VNDetectRectanglesRequest` (iOS 11+) tuned for paper-like aspect ratios.
 final class DocumentDetector: @unchecked Sendable {
     private let segmentationRequest: VNDetectDocumentSegmentationRequest = {
         let request = VNDetectDocumentSegmentationRequest()

@@ -6,8 +6,10 @@ This is a custom **AVFoundation + Vision + Core Image** pipeline — not a wrapp
 
 ## Requirements
 
-- A Mac with **Xcode 15.3+** (Xcode 16 recommended)
-- An **iPhone** running **iOS 17+** (the Simulator has no usable document camera)
+- A Mac with **Xcode 15+** (Xcode 16 recommended)
+- **Supported devices:** iPhone 12, 12 mini, 12 Pro, 12 Pro Max, and every newer iPhone
+- **Minimum iOS:** **15.0** (the floor for `VNDetectDocumentSegmentationRequest` plus this camera pipeline). iPhone 12 shipped with iOS 14 and can update; install iOS 15 or later.
+- A **physical iPhone** is required for camera scanning. The Simulator can launch the app but cannot exercise live page detection.
 - An Apple ID / development team for device signing
 
 ## Open and run on a real iPhone
@@ -20,7 +22,7 @@ This is a custom **AVFoundation + Vision + Core Image** pipeline — not a wrapp
 5. Press **Run** (⌘R). On first launch, iOS will ask for **Camera** access — allow it.
 6. If iOS blocks the developer app: Settings → Privacy & Security → Developer Mode (if prompted), then Settings → General → VPN & Device Management → trust your certificate.
 
-The Simulator will show the home screen but cannot exercise live page detection. Test on hardware.
+Test scanning on a real iPhone 12 or newer. The Simulator will show the home screen but cannot exercise live page detection.
 
 ## Permissions
 
@@ -87,13 +89,15 @@ Scany.xcodeproj/          Xcode project + shared scheme
 project.yml               XcodeGen spec (optional)
 Scany/
   ScanyApp.swift          App entry + Home / Scan / Review routing
-  Info.plist              Display name, camera usage, portrait
+  Info.plist              Display name, camera usage, iOS 15 minimum, arm64
   PrivacyInfo.xcprivacy   Privacy manifest
   Assets.xcassets/        App icon + accent
   Camera/ Detection/ Processing/ Export/ Models/ UI/
 ```
 
-Display name: **Scany**. iPhone only, iOS 17+, SwiftUI, Swift 5.
+Display name: **Scany**. iPhone only, **iOS 15.0+**, arm64, SwiftUI, Swift 5.
+
+The project does **not** require iOS 17. SwiftUI APIs that shipped later (`NavigationStack`, `navigationDestination`, two-parameter `onChange`, `scrollContentBackground`, `UIColor(Color)`) are `#available`-gated with iOS 15/16 fallbacks in `UI/Compatibility.swift`. Document detection uses Vision segmentation on iOS 15+, with `VNDetectRectanglesRequest` as the real fallback when no page quad is returned.
 
 ## Notes
 

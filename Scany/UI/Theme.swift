@@ -1,4 +1,5 @@
 import SwiftUI
+import UIKit
 
 enum ScanyTheme {
     static let accent = Color(red: 0.18, green: 0.82, blue: 0.72)
@@ -10,6 +11,10 @@ enum ScanyTheme {
     static let overlaySearching = Color.white.opacity(0.85)
     static let overlaySettling = Color(red: 1.0, green: 0.84, blue: 0.28)
     static let overlayReady = accent
+
+    /// UIKit colors — do not use `UIColor(Color)`, which is iOS 17+ only.
+    static let accentUIColor = UIColor(red: 0.18, green: 0.82, blue: 0.72, alpha: 1)
+    static let overlaySettlingUIColor = UIColor(red: 1.0, green: 0.84, blue: 0.28, alpha: 1)
 }
 
 enum ScanGuidance: Equatable {
@@ -45,7 +50,7 @@ enum ScanGuidance: Equatable {
         case .holdSteady: return "hand.raised.fill"
         case .lowLight: return "lightbulb"
         case .tooBlurry: return "camera.metering.none"
-        case .capturing: return "camera.aperture"
+        case .capturing: return "camera.fill"
         case .captured: return "checkmark.circle.fill"
         }
     }
