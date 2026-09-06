@@ -1,0 +1,396 @@
+import SwiftUI
+
+struct ReviewView: View {
+    @ObservedObject var model: ScanViewModel
+    @ObservedObject var cloud: CloudManager
+    var onRescan: () -> Void
+    var onHome: () -> Void
+    var onOpenSettings: () -> Void
+
+    @State private var isEnhancing = false
+    @State private var isExporting = false
+    @State private var exportURL: URL?
+    @State private var exportError: String?
+    @State private var selectedPageID: UUID?
+    @State private var showShare = false
+    @State private var showProviderPicker = false
+    @State private var folderProvider: CloudProvider?
+    @State private var uploadResult: CloudUploadResult?
+    @State private var showUploadSuccess = false
+
+    private var isPagePresented: Binding<Bool> {
+        Binding(
+            get: { selectedPageID != nil },
+            set: { if !$0 { selectedPageID = nil } }
+        )
+    }
+
+    var body: some View {
+        navigationContainer {
+            ZStack {
+                ScanyTheme.ink.ignoresSafeArea()
+
+                if model.document.pages.isEmpty {
+                    emptyState
+                } else {
+                    pageList
+                }
+            }
+            .navigationTitle(model.document.title)
+            .navigationBarTitleDisplayMode(.inline)
+            .scanyToolbarChrome()
+            .toolbar {
+                ToolbarItem(placement: .navigationBarLeading) {
+                    Button("Home", action: onHome)
+                }
+                ToolbarItem(placement: .navigationBarTrailing) {
+                    EditButton()
+                        .disabled(model.document.pages.isEmpty)
+                }
+            }
+            .safeAreaInset(edge: .bottom) { bottomActions }
+            .sheet(isPresented: $showShare) {
+                if let exportURL = exportURL {
+                    ActivityShareSheet(items: [exportURL])
+                }
+            }
+            .sheet(item: $folderProvider) { provider in
+                CloudFolderPickerView(cloud: cloud, provider: provider)
+            }
+            .confirmationDialog("Save PDF to", isPresented: $showProviderPicker, titleVisibility: .visible) {
+                ForEach(cloud.readyProviders) { provider in
+                    Button(provider.saveActionTitle) {
+                        Task { await saveToCloud(provider) }
+                    }
+                }
+                Button("Cancel", role: .cancel) {}
+            }
+            .alert("Could not export", isPresented: Binding(
+                get: { exportError != nil && !showUploadSuccess },
+                set: { if !$0 { exportError = nil } }
+            )) {
+                Button("OK", role: .cancel) {}
+            } message: {
+                Text(exportError ?? "")
+            }
+            .background(uploadSuccessAlert)
+            .background(ios15PushLink)
+            .scanyNavigationDestination(isPresented: isPagePresented) {
+                pagePreview
+            }
+        }
+    }
+
+    private var uploadSuccessAlert: some View {
+        EmptyView()
+            .alert("Uploaded", isPresented: $showUploadSuccess) {
+                Button("Clear local copies") {
+                    model.clearLocalCopies()
+                    uploadResult = nil
+                    onHome()
+                }
+                Button("Keep scanning", role: .cancel) {
+                    uploadResult = nil
+                }
+            } message: {
+                Text(uploadSuccessMessage)
+            }
+    }
+
+    private var uploadSuccessMessage: String {
+        guard let uploadResult else { return "The PDF is in your cloud folder." }
+        let place = uploadResult.isSimulated
+            ? "the sandbox folder \(uploadResult.folderName)"
+            : "\(uploadResult.folderName) on \(uploadResult.provider.displayName)"
+        return "\(uploadResult.fileName) is in \(place). Local page images can be cleared — Scany does not keep a document library."
+    }
+
+    @ViewBuilder
+    private func navigationContainer<Content: View>(@ViewBuilder content: () -> Content) -> some View {
+        if #available(iOS 16.0, *) {
+            NavigationStack { content() }
+        } else {
+            NavigationView { content() }
+                .navigationViewStyle(.stack)
+        }
+    }
+
+    /// `NavigationLink(isActive:)` is the iOS 15 push path. iOS 16+ uses
+    /// `navigationDestination(isPresented:)` instead.
+    @ViewBuilder
+    private var ios15PushLink: some View {
+        if #available(iOS 16.0, *) {
+            EmptyView()
+        } else {
+            NavigationLink(destination: pagePreview, isActive: isPagePresented) {
+                EmptyView()
+            }
+            .hidden()
+        }
+    }
+
+    @ViewBuilder
+    private var pagePreview: some View {
+        if let id = selectedPageID,
+           let page = model.document.pages.first(where: { $0.id == id }) {
+            PagePreviewView(page: page, enhanced: model.document.autoEnhanceAllPages)
+        } else {
+            Text("Page unavailable")
+                .foregroundStyle(.white)
+        }
+    }
+
+    private var emptyState: some View {
+        VStack(spacing: 14) {
+            Image(systemName: "doc.viewfinder")
+                .font(.system(size: 40))
+                .foregroundStyle(ScanyTheme.accent)
+            Text("No pages yet")
+                .font(.title3.weight(.semibold))
+                .foregroundStyle(.white)
+            Button("Back to camera", action: onRescan)
+                .buttonStyle(.borderedProminent)
+                .tint(ScanyTheme.accent)
+                .foregroundStyle(ScanyTheme.ink)
+        }
+    }
+
+    private var pageList: some View {
+        List {
+            Section {
+                enhanceCard
+            }
+            .listRowInsets(EdgeInsets(top: 12, leading: 16, bottom: 8, trailing: 16))
+            .listRowBackground(Color.clear)
+
+            Section("Pages") {
+                ForEach(Array(model.document.pages.enumerated()), id: \.element.id) { index, page in
+                    Button {
+                        selectedPageID = page.id
+                    } label: {
+                        HStack(spacing: 14) {
+                            Image(uiImage: page.thumbnail)
+                                .resizable()
+                                .scaledToFill()
+                                .frame(width: 54, height: 72)
+                                .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
+
+                            VStack(alignment: .leading, spacing: 4) {
+                                Text("Page \(index + 1)")
+                                    .font(.headline)
+                                    .foregroundStyle(.white)
+                                Text(page.enhancedURL != nil && model.document.autoEnhanceAllPages
+                                     ? "Enhanced"
+                                     : "Original")
+                                    .font(.caption)
+                                    .foregroundStyle(.white.opacity(0.55))
+                            }
+                            Spacer()
+                            Image(systemName: "chevron.right")
+                                .font(.caption.weight(.semibold))
+                                .foregroundStyle(.white.opacity(0.35))
+                        }
+                    }
+                }
+                .onDelete { offsets in
+                    let ids = offsets.map { model.document.pages[$0].id }
+                    ids.forEach { model.deletePage(id: $0) }
+                }
+                .onMove(perform: model.movePages)
+            }
+        }
+        .scanyHideListBackground()
+        .listStyle(.insetGrouped)
+    }
+
+    private var enhanceCard: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            HStack {
+                Image(systemName: "wand.and.stars")
+                    .foregroundStyle(ScanyTheme.accent)
+                Text("Auto-enhance")
+                    .font(.headline)
+                    .foregroundStyle(.white)
+                Spacer()
+            }
+
+            Text("Boost contrast and sharpness on every page. Turn it on once — Scany applies it to this whole document, including pages you capture next.")
+                .font(.footnote)
+                .foregroundStyle(.white.opacity(0.65))
+                .fixedSize(horizontal: false, vertical: true)
+
+            Toggle(
+                model.document.autoEnhanceAllPages ? "Enhancement on for all pages" : "Auto-enhance all pages",
+                isOn: enhanceBinding
+            )
+            .tint(ScanyTheme.accent)
+            .foregroundStyle(.white)
+            .disabled(isEnhancing)
+
+            if isEnhancing {
+                ProgressView("Enhancing pages…")
+                    .progressViewStyle(.circular)
+                    .tint(ScanyTheme.accent)
+                    .foregroundStyle(.white)
+            }
+        }
+        .padding(16)
+        .background(Color.white.opacity(0.06), in: RoundedRectangle(cornerRadius: 16, style: .continuous))
+    }
+
+    private var enhanceBinding: Binding<Bool> {
+        Binding(
+            get: { model.document.autoEnhanceAllPages },
+            set: { enabled in
+                if enabled {
+                    isEnhancing = true
+                    Task {
+                        await model.applyAutoEnhanceToAllPages()
+                        isEnhancing = false
+                    }
+                } else {
+                    model.disableAutoEnhance()
+                }
+            }
+        )
+    }
+
+    private var bottomActions: some View {
+        VStack(spacing: 10) {
+            Button {
+                Task { await handlePrimarySave() }
+            } label: {
+                HStack {
+                    if isExporting {
+                        ProgressView().tint(ScanyTheme.ink)
+                    } else {
+                        Image(systemName: "externaldrive.badge.icloud")
+                    }
+                    Text(isExporting ? "Saving…" : primarySaveTitle)
+                        .font(.headline)
+                }
+                .frame(maxWidth: .infinity)
+                .padding(.vertical, 14)
+                .background(ScanyTheme.accent, in: Capsule())
+                .foregroundStyle(ScanyTheme.ink)
+            }
+            .disabled(model.document.pages.isEmpty || isExporting)
+
+            Button {
+                Task { await sharePDF() }
+            } label: {
+                Text("Share another way…")
+                    .font(.subheadline.weight(.semibold))
+                    .foregroundStyle(.white.opacity(0.8))
+            }
+            .disabled(model.document.pages.isEmpty || isExporting)
+
+            Button("Scan more pages", action: onRescan)
+                .font(.subheadline.weight(.semibold))
+                .foregroundStyle(ScanyTheme.accent)
+        }
+        .padding(.horizontal, 20)
+        .padding(.top, 10)
+        .padding(.bottom, 16)
+        .background(.ultraThinMaterial)
+    }
+
+    private var primarySaveTitle: String {
+        if let provider = cloud.preferredUploadProvider {
+            return provider.saveActionTitle
+        }
+        if cloud.readyProviders.count > 1 {
+            return "Save to cloud"
+        }
+        if !cloud.connectedProviders.isEmpty {
+            return "Choose a folder"
+        }
+        return "Connect cloud to save"
+    }
+
+    private func handlePrimarySave() async {
+        if cloud.readyProviders.isEmpty {
+            if let connected = cloud.connectedProviders.first {
+                folderProvider = connected
+                return
+            }
+            onOpenSettings()
+            return
+        }
+        if let provider = cloud.preferredUploadProvider {
+            await saveToCloud(provider)
+            return
+        }
+        showProviderPicker = true
+    }
+
+    private func saveToCloud(_ provider: CloudProvider) async {
+        isExporting = true
+        defer { isExporting = false }
+        do {
+            let pdf = try await buildPDF()
+            exportURL = pdf
+            let result = try await cloud.upload(
+                pdfURL: pdf,
+                filename: pdf.lastPathComponent,
+                provider: provider
+            )
+            uploadResult = result
+            showUploadSuccess = true
+        } catch {
+            exportError = error.localizedDescription
+        }
+    }
+
+    private func sharePDF() async {
+        isExporting = true
+        defer { isExporting = false }
+        do {
+            let url = try await buildPDF()
+            exportURL = url
+            showShare = true
+        } catch {
+            exportError = error.localizedDescription
+        }
+    }
+
+    private func buildPDF() async throws -> URL {
+        let title = model.document.title
+        let directory = model.document.storageDirectory
+        let pageURLs: [URL] = model.document.pages.map { page in
+            (model.document.autoEnhanceAllPages ? page.enhancedURL : nil) ?? page.originalURL
+        }
+        return try await Task.detached {
+            try PDFExporter.export(
+                title: title,
+                pageImageURLs: pageURLs,
+                outputDirectory: directory
+            )
+        }.value
+    }
+}
+
+struct PagePreviewView: View {
+    let page: ScannedPage
+    let enhanced: Bool
+
+    var body: some View {
+        ZStack {
+            ScanyTheme.ink.ignoresSafeArea()
+            if let image = page.displayImage(enhanced: enhanced) {
+                ScrollView([.horizontal, .vertical]) {
+                    Image(uiImage: image)
+                        .resizable()
+                        .scaledToFit()
+                        .padding()
+                }
+            } else {
+                Text("Could not load this page.")
+                    .foregroundStyle(.white)
+            }
+        }
+        .navigationTitle("Page")
+        .navigationBarTitleDisplayMode(.inline)
+        .scanyToolbarChrome()
+    }
+}

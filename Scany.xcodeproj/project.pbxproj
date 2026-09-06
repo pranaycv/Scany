@@ -1,0 +1,619 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 56;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		A30000000000000000000001 /* ScanyApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000001 /* ScanyApp.swift */; };
+		A30000000000000000000002 /* DocumentQuad.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000002 /* DocumentQuad.swift */; };
+		A30000000000000000000003 /* ScannedPage.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000003 /* ScannedPage.swift */; };
+		A30000000000000000000004 /* ScanDocument.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000004 /* ScanDocument.swift */; };
+		A30000000000000000000005 /* CameraSession.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000005 /* CameraSession.swift */; };
+		A30000000000000000000006 /* CameraPreviewView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000006 /* CameraPreviewView.swift */; };
+		A30000000000000000000007 /* DocumentDetector.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000007 /* DocumentDetector.swift */; };
+		A30000000000000000000008 /* QuadStabilizer.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000008 /* QuadStabilizer.swift */; };
+		A30000000000000000000009 /* PerspectiveCorrector.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000009 /* PerspectiveCorrector.swift */; };
+		A30000000000000000000010 /* OrientationCorrector.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000010 /* OrientationCorrector.swift */; };
+		A30000000000000000000011 /* ImageEnhancer.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000011 /* ImageEnhancer.swift */; };
+		A30000000000000000000012 /* ScanImageFactory.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000012 /* ScanImageFactory.swift */; };
+		A30000000000000000000019 /* PageCaptureProcessor.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000019 /* PageCaptureProcessor.swift */; };
+		A30000000000000000000013 /* PDFExporter.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000013 /* PDFExporter.swift */; };
+		A30000000000000000000014 /* Theme.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000014 /* Theme.swift */; };
+		A30000000000000000000020 /* Compatibility.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000020 /* Compatibility.swift */; };
+		A30000000000000000000015 /* HomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000015 /* HomeView.swift */; };
+		A30000000000000000000016 /* ScanViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000016 /* ScanViewModel.swift */; };
+		A30000000000000000000017 /* ScanSessionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000017 /* ScanSessionView.swift */; };
+		A30000000000000000000018 /* ReviewView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000018 /* ReviewView.swift */; };
+		A30000000000000000000021 /* CloudConfig.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000021 /* CloudConfig.swift */; };
+		A30000000000000000000022 /* CloudModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000022 /* CloudModels.swift */; };
+		A30000000000000000000023 /* KeychainStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000023 /* KeychainStore.swift */; };
+		A30000000000000000000024 /* OAuthSession.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000024 /* OAuthSession.swift */; };
+		A30000000000000000000025 /* CloudHTTP.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000025 /* CloudHTTP.swift */; };
+		A30000000000000000000026 /* GoogleDriveService.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000026 /* GoogleDriveService.swift */; };
+		A30000000000000000000027 /* OneDriveService.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000027 /* OneDriveService.swift */; };
+		A30000000000000000000028 /* SimulatedCloudStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000028 /* SimulatedCloudStore.swift */; };
+		A30000000000000000000029 /* CloudManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000029 /* CloudManager.swift */; };
+		A30000000000000000000030 /* PresentingViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000030 /* PresentingViewController.swift */; };
+		A30000000000000000000031 /* CloudSettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000031 /* CloudSettingsView.swift */; };
+		A30000000000000000000032 /* CloudFolderPickerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000032 /* CloudFolderPickerView.swift */; };
+		A40000000000000000000005 /* GoogleSignIn in Frameworks */ = {isa = PBXBuildFile; productRef = A40000000000000000000003 /* GoogleSignIn */; };
+		A40000000000000000000006 /* MSAL in Frameworks */ = {isa = PBXBuildFile; productRef = A40000000000000000000004 /* MSAL */; };
+		A10000000000000000000025 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000024 /* Assets.xcassets */; };
+		A10000000000000000000028 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000027 /* PrivacyInfo.xcprivacy */; };
+		A10000000000000000000030 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000029 /* Preview Assets.xcassets */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		A10000000000000000000003 /* Scany.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Scany.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		A20000000000000000000001 /* ScanyApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScanyApp.swift; sourceTree = "<group>"; };
+		A20000000000000000000002 /* DocumentQuad.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DocumentQuad.swift; sourceTree = "<group>"; };
+		A20000000000000000000003 /* ScannedPage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScannedPage.swift; sourceTree = "<group>"; };
+		A20000000000000000000004 /* ScanDocument.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScanDocument.swift; sourceTree = "<group>"; };
+		A20000000000000000000005 /* CameraSession.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CameraSession.swift; sourceTree = "<group>"; };
+		A20000000000000000000006 /* CameraPreviewView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CameraPreviewView.swift; sourceTree = "<group>"; };
+		A20000000000000000000007 /* DocumentDetector.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DocumentDetector.swift; sourceTree = "<group>"; };
+		A20000000000000000000008 /* QuadStabilizer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QuadStabilizer.swift; sourceTree = "<group>"; };
+		A20000000000000000000009 /* PerspectiveCorrector.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PerspectiveCorrector.swift; sourceTree = "<group>"; };
+		A20000000000000000000010 /* OrientationCorrector.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OrientationCorrector.swift; sourceTree = "<group>"; };
+		A20000000000000000000011 /* ImageEnhancer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageEnhancer.swift; sourceTree = "<group>"; };
+		A20000000000000000000012 /* ScanImageFactory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScanImageFactory.swift; sourceTree = "<group>"; };
+		A20000000000000000000019 /* PageCaptureProcessor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PageCaptureProcessor.swift; sourceTree = "<group>"; };
+		A20000000000000000000013 /* PDFExporter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PDFExporter.swift; sourceTree = "<group>"; };
+		A20000000000000000000014 /* Theme.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Theme.swift; sourceTree = "<group>"; };
+		A20000000000000000000020 /* Compatibility.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Compatibility.swift; sourceTree = "<group>"; };
+		A20000000000000000000015 /* HomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeView.swift; sourceTree = "<group>"; };
+		A20000000000000000000016 /* ScanViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScanViewModel.swift; sourceTree = "<group>"; };
+		A20000000000000000000017 /* ScanSessionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScanSessionView.swift; sourceTree = "<group>"; };
+		A20000000000000000000018 /* ReviewView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReviewView.swift; sourceTree = "<group>"; };
+		A20000000000000000000021 /* CloudConfig.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CloudConfig.swift; sourceTree = "<group>"; };
+		A20000000000000000000022 /* CloudModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CloudModels.swift; sourceTree = "<group>"; };
+		A20000000000000000000023 /* KeychainStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeychainStore.swift; sourceTree = "<group>"; };
+		A20000000000000000000024 /* OAuthSession.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OAuthSession.swift; sourceTree = "<group>"; };
+		A20000000000000000000025 /* CloudHTTP.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CloudHTTP.swift; sourceTree = "<group>"; };
+		A20000000000000000000026 /* GoogleDriveService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GoogleDriveService.swift; sourceTree = "<group>"; };
+		A20000000000000000000027 /* OneDriveService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OneDriveService.swift; sourceTree = "<group>"; };
+		A20000000000000000000028 /* SimulatedCloudStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SimulatedCloudStore.swift; sourceTree = "<group>"; };
+		A20000000000000000000029 /* CloudManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CloudManager.swift; sourceTree = "<group>"; };
+		A20000000000000000000030 /* PresentingViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PresentingViewController.swift; sourceTree = "<group>"; };
+		A20000000000000000000031 /* CloudSettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CloudSettingsView.swift; sourceTree = "<group>"; };
+		A20000000000000000000032 /* CloudFolderPickerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CloudFolderPickerView.swift; sourceTree = "<group>"; };
+		A10000000000000000000024 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		A10000000000000000000026 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		A10000000000000000000027 /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
+		A10000000000000000000029 /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		A10000000000000000000017 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				A40000000000000000000005 /* GoogleSignIn in Frameworks */,
+				A40000000000000000000006 /* MSAL in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		A10000000000000000000004 = {
+			isa = PBXGroup;
+			children = (
+				A10000000000000000000006 /* Scany */,
+				A10000000000000000000005 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		A10000000000000000000005 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				A10000000000000000000003 /* Scany.app */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		A10000000000000000000006 /* Scany */ = {
+			isa = PBXGroup;
+			children = (
+				A20000000000000000000001 /* ScanyApp.swift */,
+				A10000000000000000000007 /* Models */,
+				A10000000000000000000008 /* Camera */,
+				A10000000000000000000009 /* Detection */,
+				A10000000000000000000010 /* Processing */,
+				A10000000000000000000011 /* Export */,
+				A10000000000000000000032 /* Cloud */,
+				A10000000000000000000012 /* UI */,
+				A10000000000000000000024 /* Assets.xcassets */,
+				A10000000000000000000026 /* Info.plist */,
+				A10000000000000000000027 /* PrivacyInfo.xcprivacy */,
+				A10000000000000000000031 /* Preview Content */,
+			);
+			path = Scany;
+			sourceTree = "<group>";
+		};
+		A10000000000000000000007 /* Models */ = {
+			isa = PBXGroup;
+			children = (
+				A20000000000000000000002 /* DocumentQuad.swift */,
+				A20000000000000000000003 /* ScannedPage.swift */,
+				A20000000000000000000004 /* ScanDocument.swift */,
+			);
+			path = Models;
+			sourceTree = "<group>";
+		};
+		A10000000000000000000008 /* Camera */ = {
+			isa = PBXGroup;
+			children = (
+				A20000000000000000000005 /* CameraSession.swift */,
+				A20000000000000000000006 /* CameraPreviewView.swift */,
+			);
+			path = Camera;
+			sourceTree = "<group>";
+		};
+		A10000000000000000000009 /* Detection */ = {
+			isa = PBXGroup;
+			children = (
+				A20000000000000000000007 /* DocumentDetector.swift */,
+				A20000000000000000000008 /* QuadStabilizer.swift */,
+			);
+			path = Detection;
+			sourceTree = "<group>";
+		};
+		A10000000000000000000010 /* Processing */ = {
+			isa = PBXGroup;
+			children = (
+				A20000000000000000000009 /* PerspectiveCorrector.swift */,
+				A20000000000000000000010 /* OrientationCorrector.swift */,
+				A20000000000000000000011 /* ImageEnhancer.swift */,
+				A20000000000000000000012 /* ScanImageFactory.swift */,
+				A20000000000000000000019 /* PageCaptureProcessor.swift */,
+			);
+			path = Processing;
+			sourceTree = "<group>";
+		};
+		A10000000000000000000011 /* Export */ = {
+			isa = PBXGroup;
+			children = (
+				A20000000000000000000013 /* PDFExporter.swift */,
+			);
+			path = Export;
+			sourceTree = "<group>";
+		};
+		A10000000000000000000012 /* UI */ = {
+			isa = PBXGroup;
+			children = (
+				A20000000000000000000014 /* Theme.swift */,
+				A20000000000000000000020 /* Compatibility.swift */,
+				A20000000000000000000015 /* HomeView.swift */,
+				A10000000000000000000013 /* Scan */,
+				A10000000000000000000014 /* Review */,
+				A10000000000000000000033 /* Settings */,
+			);
+			path = UI;
+			sourceTree = "<group>";
+		};
+		A10000000000000000000013 /* Scan */ = {
+			isa = PBXGroup;
+			children = (
+				A20000000000000000000016 /* ScanViewModel.swift */,
+				A20000000000000000000017 /* ScanSessionView.swift */,
+			);
+			path = Scan;
+			sourceTree = "<group>";
+		};
+		A10000000000000000000014 /* Review */ = {
+			isa = PBXGroup;
+			children = (
+				A20000000000000000000018 /* ReviewView.swift */,
+			);
+			path = Review;
+			sourceTree = "<group>";
+		};
+		A10000000000000000000032 /* Cloud */ = {
+			isa = PBXGroup;
+			children = (
+				A20000000000000000000021 /* CloudConfig.swift */,
+				A20000000000000000000022 /* CloudModels.swift */,
+				A20000000000000000000023 /* KeychainStore.swift */,
+				A20000000000000000000024 /* OAuthSession.swift */,
+				A20000000000000000000025 /* CloudHTTP.swift */,
+				A20000000000000000000026 /* GoogleDriveService.swift */,
+				A20000000000000000000027 /* OneDriveService.swift */,
+				A20000000000000000000028 /* SimulatedCloudStore.swift */,
+				A20000000000000000000029 /* CloudManager.swift */,
+				A20000000000000000000030 /* PresentingViewController.swift */,
+			);
+			path = Cloud;
+			sourceTree = "<group>";
+		};
+		A10000000000000000000033 /* Settings */ = {
+			isa = PBXGroup;
+			children = (
+				A20000000000000000000031 /* CloudSettingsView.swift */,
+				A20000000000000000000032 /* CloudFolderPickerView.swift */,
+			);
+			path = Settings;
+			sourceTree = "<group>";
+		};
+		A10000000000000000000031 /* Preview Content */ = {
+			isa = PBXGroup;
+			children = (
+				A10000000000000000000029 /* Preview Assets.xcassets */,
+			);
+			path = "Preview Content";
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		A10000000000000000000002 /* Scany */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = A10000000000000000000019 /* Build configuration list for PBXNativeTarget "Scany" */;
+			buildPhases = (
+				A10000000000000000000015 /* Sources */,
+				A10000000000000000000017 /* Frameworks */,
+				A10000000000000000000016 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = Scany;
+			packageProductDependencies = (
+				A40000000000000000000003 /* GoogleSignIn */,
+				A40000000000000000000004 /* MSAL */,
+			);
+			productName = Scany;
+			productReference = A10000000000000000000003 /* Scany.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		A10000000000000000000001 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = 1;
+				LastSwiftUpdateCheck = 1600;
+				LastUpgradeCheck = 1600;
+				TargetAttributes = {
+					A10000000000000000000002 = {
+						CreatedOnToolsVersion = 16.0;
+					};
+				};
+			};
+			buildConfigurationList = A10000000000000000000018 /* Build configuration list for PBXProject "Scany" */;
+			compatibilityVersion = "Xcode 14.0";
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = A10000000000000000000004;
+			packageReferences = (
+				A40000000000000000000001 /* XCRemoteSwiftPackageReference "GoogleSignIn-iOS" */,
+				A40000000000000000000002 /* XCRemoteSwiftPackageReference "microsoft-authentication-library-for-objc" */,
+			);
+			productRefGroup = A10000000000000000000005 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				A10000000000000000000002 /* Scany */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		A10000000000000000000016 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				A10000000000000000000030 /* Preview Assets.xcassets in Resources */,
+				A10000000000000000000028 /* PrivacyInfo.xcprivacy in Resources */,
+				A10000000000000000000025 /* Assets.xcassets in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		A10000000000000000000015 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				A30000000000000000000001 /* ScanyApp.swift in Sources */,
+				A30000000000000000000002 /* DocumentQuad.swift in Sources */,
+				A30000000000000000000003 /* ScannedPage.swift in Sources */,
+				A30000000000000000000004 /* ScanDocument.swift in Sources */,
+				A30000000000000000000005 /* CameraSession.swift in Sources */,
+				A30000000000000000000006 /* CameraPreviewView.swift in Sources */,
+				A30000000000000000000007 /* DocumentDetector.swift in Sources */,
+				A30000000000000000000008 /* QuadStabilizer.swift in Sources */,
+				A30000000000000000000009 /* PerspectiveCorrector.swift in Sources */,
+				A30000000000000000000010 /* OrientationCorrector.swift in Sources */,
+				A30000000000000000000011 /* ImageEnhancer.swift in Sources */,
+				A30000000000000000000012 /* ScanImageFactory.swift in Sources */,
+				A30000000000000000000019 /* PageCaptureProcessor.swift in Sources */,
+				A30000000000000000000013 /* PDFExporter.swift in Sources */,
+				A30000000000000000000014 /* Theme.swift in Sources */,
+				A30000000000000000000020 /* Compatibility.swift in Sources */,
+				A30000000000000000000015 /* HomeView.swift in Sources */,
+				A30000000000000000000016 /* ScanViewModel.swift in Sources */,
+				A30000000000000000000017 /* ScanSessionView.swift in Sources */,
+				A30000000000000000000018 /* ReviewView.swift in Sources */,
+				A30000000000000000000021 /* CloudConfig.swift in Sources */,
+				A30000000000000000000022 /* CloudModels.swift in Sources */,
+				A30000000000000000000023 /* KeychainStore.swift in Sources */,
+				A30000000000000000000024 /* OAuthSession.swift in Sources */,
+				A30000000000000000000025 /* CloudHTTP.swift in Sources */,
+				A30000000000000000000026 /* GoogleDriveService.swift in Sources */,
+				A30000000000000000000027 /* OneDriveService.swift in Sources */,
+				A30000000000000000000028 /* SimulatedCloudStore.swift in Sources */,
+				A30000000000000000000029 /* CloudManager.swift in Sources */,
+				A30000000000000000000030 /* PresentingViewController.swift in Sources */,
+				A30000000000000000000031 /* CloudSettingsView.swift in Sources */,
+				A30000000000000000000032 /* CloudFolderPickerView.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		A10000000000000000000020 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = iphoneos;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+			};
+			name = Debug;
+		};
+		A10000000000000000000021 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				SDKROOT = iphoneos;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		A10000000000000000000022 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ARCHS = arm64;
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_ASSET_PATHS = "\"Scany/Preview Content\"";
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = Scany/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = Scany;
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.productivity";
+				INFOPLIST_KEY_NSCameraUsageDescription = "Scany uses the camera to detect, straighten, and capture document pages.";
+				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
+				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.pranaycv.Scany;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SUPPORTS_MACCATALYST = NO;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_STRICT_CONCURRENCY = targeted;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 1;
+			};
+			name = Debug;
+		};
+		A10000000000000000000023 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ARCHS = arm64;
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_ASSET_PATHS = "\"Scany/Preview Content\"";
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = Scany/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = Scany;
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.productivity";
+				INFOPLIST_KEY_NSCameraUsageDescription = "Scany uses the camera to detect, straighten, and capture document pages.";
+				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
+				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.pranaycv.Scany;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SUPPORTS_MACCATALYST = NO;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_STRICT_CONCURRENCY = targeted;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 1;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		A10000000000000000000018 /* Build configuration list for PBXProject "Scany" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				A10000000000000000000020 /* Debug */,
+				A10000000000000000000021 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		A10000000000000000000019 /* Build configuration list for PBXNativeTarget "Scany" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				A10000000000000000000022 /* Debug */,
+				A10000000000000000000023 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		A40000000000000000000001 /* XCRemoteSwiftPackageReference "GoogleSignIn-iOS" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/google/GoogleSignIn-iOS";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 8.0.0;
+			};
+		};
+		A40000000000000000000002 /* XCRemoteSwiftPackageReference "microsoft-authentication-library-for-objc" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/AzureAD/microsoft-authentication-library-for-objc";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 1.5.0;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		A40000000000000000000003 /* GoogleSignIn */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = A40000000000000000000001 /* XCRemoteSwiftPackageReference "GoogleSignIn-iOS" */;
+			productName = GoogleSignIn;
+		};
+		A40000000000000000000004 /* MSAL */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = A40000000000000000000002 /* XCRemoteSwiftPackageReference "microsoft-authentication-library-for-objc" */;
+			productName = MSAL;
+		};
+/* End XCSwiftPackageProductDependency section */
+	};
+	rootObject = A10000000000000000000001 /* Project object */;
+}
