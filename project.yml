@@ -44,5 +44,17 @@ targets:
         DEVELOPMENT_ASSET_PATHS: '"Scany/Preview Content"'
         CODE_SIGN_STYLE: Automatic
         SWIFT_STRICT_CONCURRENCY: targeted
+    dependencies:
+      - package: GoogleSignIn
+        product: GoogleSignIn
+      - package: MSAL
+        product: MSAL
     scheme:
       testTargets: []
+packages:
+  GoogleSignIn:
+    url: https://github.com/google/GoogleSignIn-iOS
+    from: 8.0.0
+  MSAL:
+    url: https://github.com/AzureAD/microsoft-authentication-library-for-objc
+    from: 1.5.0

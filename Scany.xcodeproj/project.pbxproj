@@ -27,6 +27,20 @@
 		A30000000000000000000016 /* ScanViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000016 /* ScanViewModel.swift */; };
 		A30000000000000000000017 /* ScanSessionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000017 /* ScanSessionView.swift */; };
 		A30000000000000000000018 /* ReviewView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000018 /* ReviewView.swift */; };
+		A30000000000000000000021 /* CloudConfig.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000021 /* CloudConfig.swift */; };
+		A30000000000000000000022 /* CloudModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000022 /* CloudModels.swift */; };
+		A30000000000000000000023 /* KeychainStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000023 /* KeychainStore.swift */; };
+		A30000000000000000000024 /* OAuthSession.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000024 /* OAuthSession.swift */; };
+		A30000000000000000000025 /* CloudHTTP.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000025 /* CloudHTTP.swift */; };
+		A30000000000000000000026 /* GoogleDriveService.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000026 /* GoogleDriveService.swift */; };
+		A30000000000000000000027 /* OneDriveService.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000027 /* OneDriveService.swift */; };
+		A30000000000000000000028 /* SimulatedCloudStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000028 /* SimulatedCloudStore.swift */; };
+		A30000000000000000000029 /* CloudManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000029 /* CloudManager.swift */; };
+		A30000000000000000000030 /* PresentingViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000030 /* PresentingViewController.swift */; };
+		A30000000000000000000031 /* CloudSettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000031 /* CloudSettingsView.swift */; };
+		A30000000000000000000032 /* CloudFolderPickerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000032 /* CloudFolderPickerView.swift */; };
+		A40000000000000000000005 /* GoogleSignIn in Frameworks */ = {isa = PBXBuildFile; productRef = A40000000000000000000003 /* GoogleSignIn */; };
+		A40000000000000000000006 /* MSAL in Frameworks */ = {isa = PBXBuildFile; productRef = A40000000000000000000004 /* MSAL */; };
 		A10000000000000000000025 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000024 /* Assets.xcassets */; };
 		A10000000000000000000028 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000027 /* PrivacyInfo.xcprivacy */; };
 		A10000000000000000000030 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000029 /* Preview Assets.xcassets */; };
@@ -54,6 +68,18 @@
 		A20000000000000000000016 /* ScanViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScanViewModel.swift; sourceTree = "<group>"; };
 		A20000000000000000000017 /* ScanSessionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScanSessionView.swift; sourceTree = "<group>"; };
 		A20000000000000000000018 /* ReviewView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReviewView.swift; sourceTree = "<group>"; };
+		A20000000000000000000021 /* CloudConfig.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CloudConfig.swift; sourceTree = "<group>"; };
+		A20000000000000000000022 /* CloudModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CloudModels.swift; sourceTree = "<group>"; };
+		A20000000000000000000023 /* KeychainStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeychainStore.swift; sourceTree = "<group>"; };
+		A20000000000000000000024 /* OAuthSession.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OAuthSession.swift; sourceTree = "<group>"; };
+		A20000000000000000000025 /* CloudHTTP.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CloudHTTP.swift; sourceTree = "<group>"; };
+		A20000000000000000000026 /* GoogleDriveService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GoogleDriveService.swift; sourceTree = "<group>"; };
+		A20000000000000000000027 /* OneDriveService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OneDriveService.swift; sourceTree = "<group>"; };
+		A20000000000000000000028 /* SimulatedCloudStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SimulatedCloudStore.swift; sourceTree = "<group>"; };
+		A20000000000000000000029 /* CloudManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CloudManager.swift; sourceTree = "<group>"; };
+		A20000000000000000000030 /* PresentingViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PresentingViewController.swift; sourceTree = "<group>"; };
+		A20000000000000000000031 /* CloudSettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CloudSettingsView.swift; sourceTree = "<group>"; };
+		A20000000000000000000032 /* CloudFolderPickerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CloudFolderPickerView.swift; sourceTree = "<group>"; };
 		A10000000000000000000024 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		A10000000000000000000026 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		A10000000000000000000027 /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
@@ -65,6 +91,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				A40000000000000000000005 /* GoogleSignIn in Frameworks */,
+				A40000000000000000000006 /* MSAL in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -96,6 +124,7 @@
 				A10000000000000000000009 /* Detection */,
 				A10000000000000000000010 /* Processing */,
 				A10000000000000000000011 /* Export */,
+				A10000000000000000000032 /* Cloud */,
 				A10000000000000000000012 /* UI */,
 				A10000000000000000000024 /* Assets.xcassets */,
 				A10000000000000000000026 /* Info.plist */,
@@ -161,6 +190,7 @@
 				A20000000000000000000015 /* HomeView.swift */,
 				A10000000000000000000013 /* Scan */,
 				A10000000000000000000014 /* Review */,
+				A10000000000000000000033 /* Settings */,
 			);
 			path = UI;
 			sourceTree = "<group>";
@@ -180,6 +210,32 @@
 				A20000000000000000000018 /* ReviewView.swift */,
 			);
 			path = Review;
+			sourceTree = "<group>";
+		};
+		A10000000000000000000032 /* Cloud */ = {
+			isa = PBXGroup;
+			children = (
+				A20000000000000000000021 /* CloudConfig.swift */,
+				A20000000000000000000022 /* CloudModels.swift */,
+				A20000000000000000000023 /* KeychainStore.swift */,
+				A20000000000000000000024 /* OAuthSession.swift */,
+				A20000000000000000000025 /* CloudHTTP.swift */,
+				A20000000000000000000026 /* GoogleDriveService.swift */,
+				A20000000000000000000027 /* OneDriveService.swift */,
+				A20000000000000000000028 /* SimulatedCloudStore.swift */,
+				A20000000000000000000029 /* CloudManager.swift */,
+				A20000000000000000000030 /* PresentingViewController.swift */,
+			);
+			path = Cloud;
+			sourceTree = "<group>";
+		};
+		A10000000000000000000033 /* Settings */ = {
+			isa = PBXGroup;
+			children = (
+				A20000000000000000000031 /* CloudSettingsView.swift */,
+				A20000000000000000000032 /* CloudFolderPickerView.swift */,
+			);
+			path = Settings;
 			sourceTree = "<group>";
 		};
 		A10000000000000000000031 /* Preview Content */ = {
@@ -206,6 +262,10 @@
 			dependencies = (
 			);
 			name = Scany;
+			packageProductDependencies = (
+				A40000000000000000000003 /* GoogleSignIn */,
+				A40000000000000000000004 /* MSAL */,
+			);
 			productName = Scany;
 			productReference = A10000000000000000000003 /* Scany.app */;
 			productType = "com.apple.product-type.application";
@@ -234,6 +294,10 @@
 				Base,
 			);
 			mainGroup = A10000000000000000000004;
+			packageReferences = (
+				A40000000000000000000001 /* XCRemoteSwiftPackageReference "GoogleSignIn-iOS" */,
+				A40000000000000000000002 /* XCRemoteSwiftPackageReference "microsoft-authentication-library-for-objc" */,
+			);
 			productRefGroup = A10000000000000000000005 /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
@@ -281,6 +345,18 @@
 				A30000000000000000000016 /* ScanViewModel.swift in Sources */,
 				A30000000000000000000017 /* ScanSessionView.swift in Sources */,
 				A30000000000000000000018 /* ReviewView.swift in Sources */,
+				A30000000000000000000021 /* CloudConfig.swift in Sources */,
+				A30000000000000000000022 /* CloudModels.swift in Sources */,
+				A30000000000000000000023 /* KeychainStore.swift in Sources */,
+				A30000000000000000000024 /* OAuthSession.swift in Sources */,
+				A30000000000000000000025 /* CloudHTTP.swift in Sources */,
+				A30000000000000000000026 /* GoogleDriveService.swift in Sources */,
+				A30000000000000000000027 /* OneDriveService.swift in Sources */,
+				A30000000000000000000028 /* SimulatedCloudStore.swift in Sources */,
+				A30000000000000000000029 /* CloudManager.swift in Sources */,
+				A30000000000000000000030 /* PresentingViewController.swift in Sources */,
+				A30000000000000000000031 /* CloudSettingsView.swift in Sources */,
+				A30000000000000000000032 /* CloudFolderPickerView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -506,6 +582,38 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		A40000000000000000000001 /* XCRemoteSwiftPackageReference "GoogleSignIn-iOS" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/google/GoogleSignIn-iOS";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 8.0.0;
+			};
+		};
+		A40000000000000000000002 /* XCRemoteSwiftPackageReference "microsoft-authentication-library-for-objc" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/AzureAD/microsoft-authentication-library-for-objc";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 1.5.0;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		A40000000000000000000003 /* GoogleSignIn */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = A40000000000000000000001 /* XCRemoteSwiftPackageReference "GoogleSignIn-iOS" */;
+			productName = GoogleSignIn;
+		};
+		A40000000000000000000004 /* MSAL */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = A40000000000000000000002 /* XCRemoteSwiftPackageReference "microsoft-authentication-library-for-objc" */;
+			productName = MSAL;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = A10000000000000000000001 /* Project object */;
 }

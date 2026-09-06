@@ -4,6 +4,39 @@
 <dict>
 	<key>CFBundleDisplayName</key>
 	<string>Scany</string>
+	<key>CFBundleURLTypes</key>
+	<array>
+		<dict>
+			<key>CFBundleTypeRole</key>
+			<string>Editor</string>
+			<key>CFBundleURLName</key>
+			<string>com.pranaycv.Scany.msal</string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>msauth.com.pranaycv.Scany</string>
+			</array>
+		</dict>
+		<dict>
+			<key>CFBundleTypeRole</key>
+			<string>Editor</string>
+			<key>CFBundleURLName</key>
+			<string>com.pranaycv.Scany.google</string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>scany</string>
+				<string>com.googleusercontent.apps.YOUR_GOOGLE_IOS_CLIENT_ID</string>
+			</array>
+		</dict>
+	</array>
+	<key>GIDClientID</key>
+	<string>YOUR_GOOGLE_IOS_CLIENT_ID.apps.googleusercontent.com</string>
+	<key>LSApplicationQueriesSchemes</key>
+	<array>
+		<string>msauthv2</string>
+		<string>msauthv3</string>
+		<string>googlegmail</string>
+		<string>googlechrome</string>
+	</array>
 	<key>MinimumOSVersion</key>
 	<string>15.0</string>
 	<key>NSCameraUsageDescription</key>

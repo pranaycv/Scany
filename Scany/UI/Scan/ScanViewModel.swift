@@ -112,6 +112,11 @@ final class ScanViewModel: ObservableObject {
         document.removeFromDisk()
     }
 
+    func clearLocalCopies() {
+        document.removeFromDisk()
+        document.pages = []
+    }
+
     func resetForNewScan() {
         discardSession()
         let directory = (try? ScanDocument.makeSessionDirectory())

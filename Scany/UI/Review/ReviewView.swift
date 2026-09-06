@@ -2,8 +2,10 @@ import SwiftUI
 
 struct ReviewView: View {
     @ObservedObject var model: ScanViewModel
+    @ObservedObject var cloud: CloudManager
     var onRescan: () -> Void
     var onHome: () -> Void
+    var onOpenSettings: () -> Void
 
     @State private var isEnhancing = false
     @State private var isExporting = false
@@ -11,6 +13,10 @@ struct ReviewView: View {
     @State private var exportError: String?
     @State private var selectedPageID: UUID?
     @State private var showShare = false
+    @State private var showProviderPicker = false
+    @State private var folderProvider: CloudProvider?
+    @State private var uploadResult: CloudUploadResult?
+    @State private var showUploadSuccess = false
 
     private var isPagePresented: Binding<Bool> {
         Binding(
@@ -48,19 +54,55 @@ struct ReviewView: View {
                     ActivityShareSheet(items: [exportURL])
                 }
             }
+            .sheet(item: $folderProvider) { provider in
+                CloudFolderPickerView(cloud: cloud, provider: provider)
+            }
+            .confirmationDialog("Save PDF to", isPresented: $showProviderPicker, titleVisibility: .visible) {
+                ForEach(cloud.readyProviders) { provider in
+                    Button(provider.saveActionTitle) {
+                        Task { await saveToCloud(provider) }
+                    }
+                }
+                Button("Cancel", role: .cancel) {}
+            }
             .alert("Could not export", isPresented: Binding(
-                get: { exportError != nil },
+                get: { exportError != nil && !showUploadSuccess },
                 set: { if !$0 { exportError = nil } }
             )) {
                 Button("OK", role: .cancel) {}
             } message: {
                 Text(exportError ?? "")
             }
+            .background(uploadSuccessAlert)
             .background(ios15PushLink)
             .scanyNavigationDestination(isPresented: isPagePresented) {
                 pagePreview
             }
         }
+    }
+
+    private var uploadSuccessAlert: some View {
+        EmptyView()
+            .alert("Uploaded", isPresented: $showUploadSuccess) {
+                Button("Clear local copies") {
+                    model.clearLocalCopies()
+                    uploadResult = nil
+                    onHome()
+                }
+                Button("Keep scanning", role: .cancel) {
+                    uploadResult = nil
+                }
+            } message: {
+                Text(uploadSuccessMessage)
+            }
+    }
+
+    private var uploadSuccessMessage: String {
+        guard let uploadResult else { return "The PDF is in your cloud folder." }
+        let place = uploadResult.isSimulated
+            ? "the sandbox folder \(uploadResult.folderName)"
+            : "\(uploadResult.folderName) on \(uploadResult.provider.displayName)"
+        return "\(uploadResult.fileName) is in \(place). Local page images can be cleared — Scany does not keep a document library."
     }
 
     @ViewBuilder
@@ -216,21 +258,30 @@ struct ReviewView: View {
     private var bottomActions: some View {
         VStack(spacing: 10) {
             Button {
-                Task { await exportPDF() }
+                Task { await handlePrimarySave() }
             } label: {
                 HStack {
                     if isExporting {
                         ProgressView().tint(ScanyTheme.ink)
                     } else {
-                        Image(systemName: "square.and.arrow.up")
+                        Image(systemName: "externaldrive.badge.icloud")
                     }
-                    Text(isExporting ? "Building PDF…" : "Export PDF")
+                    Text(isExporting ? "Saving…" : primarySaveTitle)
                         .font(.headline)
                 }
                 .frame(maxWidth: .infinity)
                 .padding(.vertical, 14)
                 .background(ScanyTheme.accent, in: Capsule())
                 .foregroundStyle(ScanyTheme.ink)
+            }
+            .disabled(model.document.pages.isEmpty || isExporting)
+
+            Button {
+                Task { await sharePDF() }
+            } label: {
+                Text("Share another way…")
+                    .font(.subheadline.weight(.semibold))
+                    .foregroundStyle(.white.opacity(0.8))
             }
             .disabled(model.document.pages.isEmpty || isExporting)
 
@@ -244,27 +295,78 @@ struct ReviewView: View {
         .background(.ultraThinMaterial)
     }
 
-    private func exportPDF() async {
+    private var primarySaveTitle: String {
+        if let provider = cloud.preferredUploadProvider {
+            return provider.saveActionTitle
+        }
+        if cloud.readyProviders.count > 1 {
+            return "Save to cloud"
+        }
+        if !cloud.connectedProviders.isEmpty {
+            return "Choose a folder"
+        }
+        return "Connect cloud to save"
+    }
+
+    private func handlePrimarySave() async {
+        if cloud.readyProviders.isEmpty {
+            if let connected = cloud.connectedProviders.first {
+                folderProvider = connected
+                return
+            }
+            onOpenSettings()
+            return
+        }
+        if let provider = cloud.preferredUploadProvider {
+            await saveToCloud(provider)
+            return
+        }
+        showProviderPicker = true
+    }
+
+    private func saveToCloud(_ provider: CloudProvider) async {
         isExporting = true
         defer { isExporting = false }
-        let title = model.document.title
-        let directory = model.document.storageDirectory
-        let pageURLs: [URL] = model.document.pages.map { page in
-            (model.document.autoEnhanceAllPages ? page.enhancedURL : nil) ?? page.originalURL
-        }
         do {
-            let url = try await Task.detached {
-                try PDFExporter.export(
-                    title: title,
-                    pageImageURLs: pageURLs,
-                    outputDirectory: directory
-                )
-            }.value
+            let pdf = try await buildPDF()
+            exportURL = pdf
+            let result = try await cloud.upload(
+                pdfURL: pdf,
+                filename: pdf.lastPathComponent,
+                provider: provider
+            )
+            uploadResult = result
+            showUploadSuccess = true
+        } catch {
+            exportError = error.localizedDescription
+        }
+    }
+
+    private func sharePDF() async {
+        isExporting = true
+        defer { isExporting = false }
+        do {
+            let url = try await buildPDF()
             exportURL = url
             showShare = true
         } catch {
             exportError = error.localizedDescription
         }
+    }
+
+    private func buildPDF() async throws -> URL {
+        let title = model.document.title
+        let directory = model.document.storageDirectory
+        let pageURLs: [URL] = model.document.pages.map { page in
+            (model.document.autoEnhanceAllPages ? page.enhancedURL : nil) ?? page.originalURL
+        }
+        return try await Task.detached {
+            try PDFExporter.export(
+                title: title,
+                pageImageURLs: pageURLs,
+                outputDirectory: directory
+            )
+        }.value
     }
 }
 
