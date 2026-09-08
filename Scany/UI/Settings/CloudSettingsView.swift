@@ -1,4 +1,5 @@
 import SwiftUI
+import UniformTypeIdentifiers
 
 struct CloudSettingsView: View {
     @ObservedObject var cloud: CloudManager
@@ -6,20 +7,21 @@ struct CloudSettingsView: View {
 
     @State private var folderProvider: CloudProvider?
     @State private var busyProvider: CloudProvider?
+    @State private var showiCloudPicker = false
 
     var body: some View {
         navigationContainer {
             List {
                 Section {
-                    Text("Scans are saved to Google Drive or OneDrive. Scany does not keep a local document library.")
+                    Text("Scans are saved to Google Drive or iCloud Drive. Scany does not keep a local document library.")
                         .font(.footnote)
                         .foregroundStyle(.white.opacity(0.7))
                         .listRowBackground(Color.white.opacity(0.06))
                 }
 
-                if !CloudConfig.Google.isConfigured || !CloudConfig.OneDrive.isConfigured {
+                if !CloudConfig.Google.isConfigured {
                     Section("Developer setup") {
-                        Text("Live OAuth needs client IDs in Cloud/CloudConfig.swift. Until those are set, Connect uses a sandbox folder labeled CloudUploadSimulation (works in Simulator).")
+                        Text("Live Google Drive needs a client ID in Cloud/CloudConfig.swift. Until that is set, Connect Drive uses a sandbox folder labeled CloudUploadSimulation.")
                             .font(.footnote)
                             .foregroundStyle(.white.opacity(0.65))
                     }
@@ -27,7 +29,7 @@ struct CloudSettingsView: View {
                 }
 
                 providerSection(.googleDrive)
-                providerSection(.oneDrive)
+                providerSection(.iCloud)
             }
             .scanyHideListBackground()
             .listStyle(.insetGrouped)
@@ -41,6 +43,27 @@ struct CloudSettingsView: View {
             }
             .sheet(item: $folderProvider) { provider in
                 CloudFolderPickerView(cloud: cloud, provider: provider)
+            }
+            .fileImporter(
+                isPresented: $showiCloudPicker,
+                allowedContentTypes: [.folder],
+                allowsMultipleSelection: false
+            ) { result in
+                switch result {
+                case .success(let urls):
+                    guard let url = urls.first else { return }
+                    Task { await cloud.connectICloud(folderURL: url) }
+                case .failure:
+                    break
+                }
+            }
+            .alert("Cloud", isPresented: Binding(
+                get: { cloud.statusMessage != nil },
+                set: { if !$0 { cloud.statusMessage = nil } }
+            )) {
+                Button("OK", role: .cancel) {}
+            } message: {
+                Text(cloud.statusMessage ?? "")
             }
             .overlay {
                 if let busyProvider {
@@ -91,8 +114,14 @@ struct CloudSettingsView: View {
                         }
                     }
                     Spacer()
-                    Button("Change") { folderProvider = provider }
-                        .font(.subheadline.weight(.semibold))
+                    Button("Change") {
+                        if provider == .iCloud {
+                            showiCloudPicker = true
+                        } else {
+                            folderProvider = provider
+                        }
+                    }
+                    .font(.subheadline.weight(.semibold))
                 }
 
                 Button(role: .destructive) {
@@ -102,6 +131,10 @@ struct CloudSettingsView: View {
                 }
             } else {
                 Button {
+                    if provider == .iCloud {
+                        showiCloudPicker = true
+                        return
+                    }
                     Task {
                         busyProvider = provider
                         await cloud.connect(provider)

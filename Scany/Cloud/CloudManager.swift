@@ -5,27 +5,25 @@ import UIKit
 #if canImport(GoogleSignIn)
 import GoogleSignIn
 #endif
-#if canImport(MSAL)
-import MSAL
-#endif
 
 @MainActor
 final class CloudManager: ObservableObject {
     @Published private(set) var google: CloudConnection?
-    @Published private(set) var oneDrive: CloudConnection?
+    @Published private(set) var iCloud: CloudConnection?
     @Published var lastUsedProvider: CloudProvider?
     @Published var statusMessage: String?
 
     private let googleLive: GoogleDriveService
-    private let oneDriveLive: OneDriveService
+    private let iCloudLive: ICloudDriveService
     private let googleSim: SimulatedCloudStore
-    private let oneDriveSim: SimulatedCloudStore
+    private let iCloudSim: SimulatedCloudStore
+    private var didRestoreSessions = false
 
     init() {
         googleLive = GoogleDriveService()
-        oneDriveLive = OneDriveService()
+        iCloudLive = ICloudDriveService()
         googleSim = SimulatedCloudStore(provider: .googleDrive)
-        oneDriveSim = SimulatedCloudStore(provider: .oneDrive)
+        iCloudSim = SimulatedCloudStore(provider: .iCloud)
 
         let saved = CloudDestinationStore.load()
         lastUsedProvider = saved.lastProvider
@@ -37,16 +35,22 @@ final class CloudManager: ObservableObject {
                 isSimulated: entry.isSimulated
             )
         }
-        if let entry = saved.oneDrive {
-            oneDrive = CloudConnection(
-                provider: .oneDrive,
+        if let entry = saved.iCloud {
+            iCloud = CloudConnection(
+                provider: .iCloud,
                 account: entry.account,
                 folder: entry.folder,
                 isSimulated: entry.isSimulated
             )
         }
         configureSDKs()
-        Task { await restoreLiveSessions() }
+    }
+
+    /// Google restore talks to the network. Run after the first frame so Home can paint.
+    func restoreLiveSessionsIfNeeded() async {
+        guard !didRestoreSessions else { return }
+        didRestoreSessions = true
+        await restoreLiveSessions()
     }
 
     private func configureSDKs() {
@@ -58,11 +62,11 @@ final class CloudManager: ObservableObject {
     }
 
     var connectedProviders: [CloudProvider] {
-        [google, oneDrive].compactMap { $0?.provider }
+        [google, iCloud].compactMap { $0?.provider }
     }
 
     var readyProviders: [CloudProvider] {
-        [google, oneDrive].compactMap { connection in
+        [google, iCloud].compactMap { connection in
             guard let connection, connection.isReadyToUpload else { return nil }
             return connection.provider
         }
@@ -81,7 +85,7 @@ final class CloudManager: ObservableObject {
     func connection(for provider: CloudProvider) -> CloudConnection? {
         switch provider {
         case .googleDrive: return google
-        case .oneDrive: return oneDrive
+        case .iCloud: return iCloud
         }
     }
 
@@ -93,14 +97,28 @@ final class CloudManager: ObservableObject {
         #if canImport(GoogleSignIn)
         if GIDSignIn.sharedInstance.handle(url) { return true }
         #endif
-        #if canImport(MSAL)
-        if MSALPublicClientApplication.handleMSALResponse(url, sourceApplication: nil) {
-            return true
-        }
-        #endif
         return url.scheme?.hasPrefix("scany") == true
-            || url.scheme?.hasPrefix("msauth.") == true
             || url.scheme?.hasPrefix("com.googleusercontent.apps.") == true
+    }
+
+    func connectICloud(folderURL: URL) async {
+        statusMessage = nil
+        do {
+            let account = try iCloudLive.connect(toPickedFolder: folderURL)
+            let folder = CloudFolder(id: ICloudDriveService.rootFolderID, name: folderURL.lastPathComponent)
+            setConnection(
+                CloudConnection(
+                    provider: .iCloud,
+                    account: account,
+                    folder: folder,
+                    isSimulated: false
+                )
+            )
+            lastUsedProvider = .iCloud
+            persist()
+        } catch {
+            statusMessage = error.localizedDescription
+        }
     }
 
     func connect(_ provider: CloudProvider) async {
@@ -141,7 +159,7 @@ final class CloudManager: ObservableObject {
         await simulated(provider).disconnect()
         switch provider {
         case .googleDrive: google = nil
-        case .oneDrive: oneDrive = nil
+        case .iCloud: iCloud = nil
         }
         if lastUsedProvider == provider {
             lastUsedProvider = readyProviders.first
@@ -171,7 +189,9 @@ final class CloudManager: ObservableObject {
         guard let connection = connection(for: provider), let folder = connection.folder else {
             throw CloudError.noFolder
         }
-        let data = try Data(contentsOf: pdfURL)
+        let data = try await Task.detached(priority: .userInitiated) {
+            try Data(contentsOf: pdfURL)
+        }.value
         let result = try await activeStore(provider).uploadPDF(
             data: data,
             filename: filename,
@@ -185,19 +205,19 @@ final class CloudManager: ObservableObject {
     // MARK: - Private
 
     private func restoreLiveSessions() async {
-        if google == nil, let account = await googleLive.restoreSession() {
+        if let account = await googleLive.restoreSession() {
             google = CloudConnection(
                 provider: .googleDrive,
                 account: account,
-                folder: CloudDestinationStore.load().google?.folder,
+                folder: google?.folder ?? CloudDestinationStore.load().google?.folder,
                 isSimulated: false
             )
         }
-        if oneDrive == nil, let account = await oneDriveLive.restoreSession() {
-            oneDrive = CloudConnection(
-                provider: .oneDrive,
+        if iCloud == nil, let account = await iCloudLive.restoreSession() {
+            iCloud = CloudConnection(
+                provider: .iCloud,
                 account: account,
-                folder: CloudDestinationStore.load().oneDrive?.folder,
+                folder: CloudDestinationStore.load().iCloud?.folder,
                 isSimulated: false
             )
         }
@@ -206,6 +226,14 @@ final class CloudManager: ObservableObject {
 
     private func ensureDefaultFolder(_ provider: CloudProvider) async throws -> CloudFolder {
         let existing = try await activeStore(provider).listFolders()
+        if provider == .iCloud {
+            if let root = existing.first(where: { $0.id == ICloudDriveService.rootFolderID }) {
+                return root
+            }
+            if let first = existing.first {
+                return first
+            }
+        }
         if let scany = existing.first(where: { $0.name.compare("Scany", options: .caseInsensitive) == .orderedSame }) {
             return scany
         }
@@ -215,14 +243,14 @@ final class CloudManager: ObservableObject {
     private func store(for provider: CloudProvider) -> CloudFileStore {
         switch provider {
         case .googleDrive: return googleLive
-        case .oneDrive: return oneDriveLive
+        case .iCloud: return iCloudLive
         }
     }
 
     private func simulated(_ provider: CloudProvider) -> SimulatedCloudStore {
         switch provider {
         case .googleDrive: return googleSim
-        case .oneDrive: return oneDriveSim
+        case .iCloud: return iCloudSim
         }
     }
 
@@ -233,7 +261,7 @@ final class CloudManager: ObservableObject {
     private func setConnection(_ connection: CloudConnection) {
         switch connection.provider {
         case .googleDrive: google = connection
-        case .oneDrive: oneDrive = connection
+        case .iCloud: iCloud = connection
         }
     }
 
@@ -242,8 +270,8 @@ final class CloudManager: ObservableObject {
         if let google {
             record.google = .init(account: google.account, folder: google.folder, isSimulated: google.isSimulated)
         }
-        if let oneDrive {
-            record.oneDrive = .init(account: oneDrive.account, folder: oneDrive.folder, isSimulated: oneDrive.isSimulated)
+        if let iCloud {
+            record.iCloud = .init(account: iCloud.account, folder: iCloud.folder, isSimulated: iCloud.isSimulated)
         }
         record.lastProvider = lastUsedProvider
         CloudDestinationStore.save(record)

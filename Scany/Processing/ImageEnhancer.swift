@@ -26,8 +26,8 @@ enum ImageEnhancer {
 
         let sharpen = CIFilter.unsharpMask()
         sharpen.inputImage = current
-        sharpen.radius = 1.5
-        sharpen.intensity = 0.42
+        sharpen.radius = 1.1
+        sharpen.intensity = 0.28
         if let output = sharpen.outputImage {
             current = output
         }

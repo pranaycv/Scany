@@ -9,14 +9,21 @@ struct ScanSessionView: View {
 
     var body: some View {
         ZStack {
-            Color.black.ignoresSafeArea()
-
-            cameraLayer
-            shutterFlash
-            chrome
+            if model.previewingPageID == nil {
+                Color.black.ignoresSafeArea()
+                cameraLayer
+                shutterFlash
+                chrome
+            } else {
+                CapturePreviewView(model: model, onFinish: onDone)
+            }
         }
         .statusBarHidden()
-        .onAppear { model.startIfAuthorized() }
+        .onAppear {
+            if model.previewingPageID == nil {
+                model.startIfAuthorized()
+            }
+        }
         .onDisappear { model.stop() }
         .alert("Discard this scan?", isPresented: $confirmCancel) {
             Button("Keep scanning", role: .cancel) {}
@@ -125,6 +132,7 @@ struct ScanSessionView: View {
         .padding(.vertical, 8)
         .background(.ultraThinMaterial, in: Capsule())
         .foregroundStyle(.white)
+        .opacity(model.document.pages.isEmpty ? 0.55 : 1)
         .accessibilityLabel("\(model.document.pages.count) pages captured")
     }
 
@@ -169,6 +177,9 @@ struct ScanSessionView: View {
                                     .offset(x: 4, y: -4)
                             }
                             .id(page.id)
+                            .onTapGesture {
+                                model.beginEditingPage(id: page.id)
+                            }
                             .contextMenu {
                                 Button(role: .destructive) {
                                     model.deletePage(id: page.id)
@@ -192,7 +203,19 @@ struct ScanSessionView: View {
 
     private var bottomBar: some View {
         HStack(alignment: .center) {
-            Color.clear.frame(width: 72, height: 1)
+            Button(action: onDone) {
+                VStack(spacing: 4) {
+                    Image(systemName: "arrow.right.circle.fill")
+                        .font(.body.weight(.semibold))
+                    Text("Next")
+                        .font(.caption2.weight(.semibold))
+                }
+                .foregroundStyle(.white)
+                .frame(width: 72, height: 52)
+            }
+            .disabled(model.document.pages.isEmpty || model.isProcessingCapture)
+            .opacity(model.document.pages.isEmpty ? 0.35 : 1)
+            .accessibilityLabel("Continue to pages")
 
             Spacer()
 
@@ -208,26 +231,13 @@ struct ScanSessionView: View {
             }
             .disabled(model.isProcessingCapture)
             .accessibilityLabel("Capture page now")
+            .accessibilityHint("Optional. Pages scan automatically when the rectangle locks on.")
             .opacity(0.95)
 
             Spacer()
 
-            Button(action: onDone) {
-                Text("Done")
-                    .font(.headline)
-                    .padding(.horizontal, 16)
-                    .padding(.vertical, 10)
-                    .background {
-                        if model.document.pages.isEmpty {
-                            Capsule().fill(.ultraThinMaterial)
-                        } else {
-                            Capsule().fill(ScanyTheme.accent)
-                        }
-                    }
-                    .foregroundStyle(model.document.pages.isEmpty ? .white.opacity(0.55) : ScanyTheme.ink)
-            }
-            .disabled(model.document.pages.isEmpty)
-            .frame(width: 72, alignment: .trailing)
+            Color.clear
+                .frame(width: 72, height: 52)
         }
         .padding(.horizontal, 20)
         .padding(.bottom, 22)

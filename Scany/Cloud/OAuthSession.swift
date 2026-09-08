@@ -3,8 +3,8 @@ import CommonCrypto
 import Foundation
 import UIKit
 
-/// PKCE OAuth 2.0 via `ASWebAuthenticationSession`. Used when official SDKs
-/// are not linked, or as a fallback if Sign-In / MSAL is unavailable.
+/// PKCE OAuth 2.0 via `ASWebAuthenticationSession`. Used when Google Sign-In
+/// is not linked, or as a fallback if Sign-In is unavailable.
 @MainActor
 final class OAuthSession: NSObject, ASWebAuthenticationPresentationContextProviding {
     private var session: ASWebAuthenticationSession?

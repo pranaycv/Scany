@@ -4,15 +4,11 @@ import ImageIO
 import UIKit
 
 protocol CameraSessionDelegate: AnyObject {
-    func cameraSession(
-        _ session: CameraSession,
-        didDetect quad: DocumentQuad?,
-        sharpness: Double,
-        luminance: Double
-    )
+    func cameraSession(_ session: CameraSession, didDetect quad: DocumentQuad?)
     func cameraSessionDidFinishPhoto(
         _ session: CameraSession,
         image: CIImage?,
+        jpegData: Data?,
         detectedQuad: DocumentQuad?,
         fallbackQuad: DocumentQuad?
     )
@@ -28,7 +24,7 @@ final class CameraSession: NSObject {
 
     private let sessionQueue = DispatchQueue(label: "com.scany.camera.session")
     private let visionQueue = DispatchQueue(label: "com.scany.camera.vision", qos: .userInitiated)
-    private let detector = DocumentDetector()
+    private lazy var detector = DocumentDetector()
 
     private let videoOutput = AVCaptureVideoDataOutput()
     private let photoOutput = AVCapturePhotoOutput()
@@ -38,6 +34,8 @@ final class CameraSession: NSObject {
     private var isVisionBusy = false
     private var lastVideoQuad: DocumentQuad?
     private var isConfigured = false
+    private var isCapturingPhoto = false
+    private var skipVisionFrame = 0
 
     var isRunning: Bool { session.isRunning }
 
@@ -49,8 +47,14 @@ final class CameraSession: NSObject {
 
     func configureAndStart() {
         sessionQueue.async { [weak self] in
-            self?.configureLocked()
-            self?.session.startRunning()
+            guard let self else { return }
+            self.configureLocked()
+            self.isCapturingPhoto = false
+            self.isVisionBusy = false
+            self.skipVisionFrame = 0
+            self.applyPortraitOrientation()
+            self.session.startRunning()
+            self.applyPortraitOrientation()
         }
     }
 
@@ -81,9 +85,19 @@ final class CameraSession: NSObject {
     func capturePhoto() {
         sessionQueue.async { [weak self] in
             guard let self else { return }
+            guard !self.isCapturingPhoto else { return }
+            self.isCapturingPhoto = true
             let settings = AVCapturePhotoSettings()
             settings.flashMode = .off
-            settings.photoQualityPrioritization = .balanced
+            if self.photoOutput.isStillImageStabilizationSupported {
+                settings.isAutoStillImageStabilizationEnabled = true
+            }
+            if #available(iOS 16.0, *) {
+                settings.maxPhotoDimensions = self.photoOutput.maxPhotoDimensions
+            } else {
+                settings.isHighResolutionPhotoEnabled = self.photoOutput.isHighResolutionCaptureEnabled
+            }
+            settings.photoQualityPrioritization = .quality
             self.photoOutput.capturePhoto(with: settings, delegate: self)
         }
     }
@@ -126,10 +140,22 @@ final class CameraSession: NSObject {
         }
     }
 
+    /// Maps a Vision point (normalized, origin bottom-left, in the *oriented*
+    /// image) onto the preview layer, including `.resizeAspectFill` cropping.
+    ///
+    /// Capture-device points are the unrotated sensor. Using those with a
+    /// portrait video buffer makes the overlay larger than the paper. Metadata
+    /// output rects match the picture on screen.
     func convertToLayer(_ visionPoint: CGPoint) -> CGPoint {
-        // Vision: origin bottom-left. Capture device points: origin top-left.
-        let devicePoint = CGPoint(x: visionPoint.x, y: 1 - visionPoint.y)
-        return previewLayer.layerPointConverted(fromCaptureDevicePoint: devicePoint)
+        let imageRect = previewLayer.layerRectConverted(
+            fromMetadataOutputRect: CGRect(x: 0, y: 0, width: 1, height: 1)
+        )
+        let x = visionPoint.x
+        let y = 1 - visionPoint.y
+        return CGPoint(
+            x: imageRect.minX + x * imageRect.width,
+            y: imageRect.minY + y * imageRect.height
+        )
     }
 
     // MARK: - Setup
@@ -174,9 +200,17 @@ final class CameraSession: NSObject {
             session.addOutput(videoOutput)
         }
 
-        photoOutput.maxPhotoQualityPrioritization = .balanced
+        photoOutput.maxPhotoQualityPrioritization = .quality
         if session.canAddOutput(photoOutput) {
             session.addOutput(photoOutput)
+        }
+        if #available(iOS 16.0, *) {
+            let dimensions = camera.activeFormat.supportedMaxPhotoDimensions
+            if let largest = dimensions.max(by: { $0.width * $0.height < $1.width * $1.height }) {
+                photoOutput.maxPhotoDimensions = largest
+            }
+        } else {
+            photoOutput.isHighResolutionCaptureEnabled = true
         }
 
         applyPortraitOrientation()
@@ -186,12 +220,23 @@ final class CameraSession: NSObject {
         isConfigured = true
     }
 
-    private func bestPreset() -> AVCaptureSession.Preset {
-        if session.canSetSessionPreset(.hd4K3840x2160) {
-            return .hd4K3840x2160
+    /// Back camera buffers are landscape unless the connection rotated them.
+    /// Vision's `orientation` must match so results land in portrait display space.
+    private static func visionOrientation(for pixelBuffer: CVPixelBuffer) -> CGImagePropertyOrientation {
+        let width = CVPixelBufferGetWidth(pixelBuffer)
+        let height = CVPixelBufferGetHeight(pixelBuffer)
+        if width > height {
+            return .right
         }
+        return .up
+    }
+
+    private func bestPreset() -> AVCaptureSession.Preset {
         if session.canSetSessionPreset(.photo) {
             return .photo
+        }
+        if session.canSetSessionPreset(.hd4K3840x2160) {
+            return .hd4K3840x2160
         }
         return .hd1920x1080
     }
@@ -207,9 +252,6 @@ final class CameraSession: NSObject {
             }
             if camera.isSmoothAutoFocusSupported {
                 camera.isSmoothAutoFocusEnabled = true
-            }
-            if camera.isAutoFocusRangeRestrictionSupported {
-                camera.autoFocusRangeRestriction = .near
             }
             camera.unlockForConfiguration()
         } catch {
@@ -230,30 +272,18 @@ final class CameraSession: NSObject {
         }
     }
 
-    /// Copy pixels out of the photo so later queues never touch a reused buffer.
-    private static func materializedImage(from photo: AVCapturePhoto) -> CIImage? {
-        var image: CIImage?
-        if let data = photo.fileDataRepresentation() {
-            image = CIImage(data: data)
-        } else if let pixelBuffer = photo.pixelBuffer {
-            image = CIImage(cvPixelBuffer: pixelBuffer)
+    /// Keep the camera JPEG; avoid a full-size CI round-trip that softens the page.
+    private static func materializedImage(from photo: AVCapturePhoto) -> (CIImage, Data?)? {
+        guard let data = photo.fileDataRepresentation() else {
+            if let pixelBuffer = photo.pixelBuffer {
+                return (CIImage(cvPixelBuffer: pixelBuffer), nil)
+            }
+            return nil
         }
-        guard var image else { return nil }
-
-        if let orientationValue = image.properties[kCGImagePropertyOrientation as String] as? UInt32,
-           let orientation = CGImagePropertyOrientation(rawValue: orientationValue)
-        {
-            image = image.oriented(orientation)
-        } else if let orientationValue = photo.metadata[kCGImagePropertyOrientation as String] as? UInt32,
-                  let orientation = CGImagePropertyOrientation(rawValue: orientationValue)
-        {
-            image = image.oriented(orientation)
-        }
-
-        guard let cgImage = ScanImageFactory.context.createCGImage(image, from: image.extent) else {
-            return image
-        }
-        return CIImage(cgImage: cgImage)
+        let image = CIImage(data: data, options: [.applyOrientationProperty: true])
+            ?? CIImage(data: data)
+        guard let image else { return nil }
+        return (image, data)
     }
 }
 
@@ -263,19 +293,20 @@ extension CameraSession: AVCaptureVideoDataOutputSampleBufferDelegate {
         didOutput sampleBuffer: CMSampleBuffer,
         from connection: AVCaptureConnection
     ) {
-        guard !isVisionBusy else { return }
+        guard !isVisionBusy, !isCapturingPhoto else { return }
+        skipVisionFrame += 1
+        guard skipVisionFrame % 2 == 0 else { return }
         guard let pixelBuffer = CMSampleBufferGetImageBuffer(sampleBuffer) else { return }
 
         isVisionBusy = true
-        let sharpness = FrameQuality.laplacianVariance(pixelBuffer: pixelBuffer)
-        let luminance = FrameQuality.meanLuminance(pixelBuffer: pixelBuffer)
-        let quad = detector.detect(pixelBuffer: pixelBuffer, orientation: .up)
+        let orientation = Self.visionOrientation(for: pixelBuffer)
+        let quad = detector.detect(pixelBuffer: pixelBuffer, orientation: orientation)
         lastVideoQuad = quad
         isVisionBusy = false
 
         DispatchQueue.main.async { [weak self] in
             guard let self else { return }
-            self.delegate?.cameraSession(self, didDetect: quad, sharpness: sharpness, luminance: luminance)
+            self.delegate?.cameraSession(self, didDetect: quad)
         }
     }
 }
@@ -286,7 +317,9 @@ extension CameraSession: AVCapturePhotoCaptureDelegate {
         didFinishProcessingPhoto photo: AVCapturePhoto,
         error: Error?
     ) {
-        let ciImage = error == nil ? Self.materializedImage(from: photo) : nil
+        let materialized = error == nil ? Self.materializedImage(from: photo) : nil
+        let ciImage = materialized?.0
+        let jpegData = materialized?.1
         visionQueue.async { [weak self] in
             guard let self else { return }
             let fallback = self.lastVideoQuad
@@ -295,9 +328,13 @@ extension CameraSession: AVCapturePhotoCaptureDelegate {
                 self.delegate?.cameraSessionDidFinishPhoto(
                     self,
                     image: ciImage,
+                    jpegData: jpegData,
                     detectedQuad: detected,
                     fallbackQuad: fallback
                 )
+                self.sessionQueue.async {
+                    self.isCapturingPhoto = false
+                }
             }
         }
     }

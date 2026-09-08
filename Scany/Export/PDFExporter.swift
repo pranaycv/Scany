@@ -7,10 +7,9 @@ enum PDFExporter {
     /// image aspect (capped at US Letter) so the share sheet can Save to Files.
     static func export(
         title: String,
-        pageImageURLs: [URL],
+        images: [UIImage],
         outputDirectory: URL
     ) throws -> URL {
-        let images = pageImageURLs.compactMap { UIImage(contentsOfFile: $0.path) }
         guard !images.isEmpty else { throw PDFExportError.noPages }
 
         let safeTitle = title

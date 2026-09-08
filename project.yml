@@ -1,6 +1,6 @@
 name: Scany
 options:
-  bundleIdPrefix: com.pranaycv
+  bundleIdPrefix: com.prnysoni
   deploymentTarget:
     iOS: "15.0"
   xcodeVersion: "16.0"
@@ -27,7 +27,7 @@ targets:
         type: folder
     settings:
       base:
-        PRODUCT_BUNDLE_IDENTIFIER: com.pranaycv.Scany
+        PRODUCT_BUNDLE_IDENTIFIER: com.prnysoni.Scany
         INFOPLIST_FILE: Scany/Info.plist
         GENERATE_INFOPLIST_FILE: YES
         INFOPLIST_KEY_CFBundleDisplayName: Scany
@@ -48,14 +48,9 @@ targets:
     dependencies:
       - package: GoogleSignIn
         product: GoogleSignIn
-      - package: MSAL
-        product: MSAL
     scheme:
       testTargets: []
 packages:
   GoogleSignIn:
     url: https://github.com/google/GoogleSignIn-iOS
     from: 8.0.0
-  MSAL:
-    url: https://github.com/AzureAD/microsoft-authentication-library-for-objc
-    from: 1.5.0

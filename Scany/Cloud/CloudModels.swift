@@ -3,28 +3,28 @@ import UIKit
 
 enum CloudProvider: String, Codable, CaseIterable, Identifiable {
     case googleDrive
-    case oneDrive
+    case iCloud
 
     var id: String { rawValue }
 
     var displayName: String {
         switch self {
         case .googleDrive: return "Google Drive"
-        case .oneDrive: return "OneDrive"
+        case .iCloud: return "iCloud"
         }
     }
 
     var saveActionTitle: String {
         switch self {
         case .googleDrive: return "Save to Drive"
-        case .oneDrive: return "Save to OneDrive"
+        case .iCloud: return "Save to iCloud"
         }
     }
 
     var systemImage: String {
         switch self {
         case .googleDrive: return "externaldrive.badge.icloud"
-        case .oneDrive: return "cloud"
+        case .iCloud: return "icloud"
         }
     }
 }
@@ -56,7 +56,7 @@ struct CloudUploadResult: Equatable {
     var isSimulated: Bool
 }
 
-enum CloudError: LocalizedError {
+enum CloudError: LocalizedError, Sendable {
     case notConfigured
     case notSignedIn
     case noFolder

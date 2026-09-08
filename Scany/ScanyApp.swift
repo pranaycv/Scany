@@ -28,7 +28,10 @@ struct RootView: View {
             case .home:
                 HomeView(
                     cloud: cloud,
-                    onStartScan: { route = .scanning },
+                    onStartScan: {
+                        scanModel.prepareSession()
+                        route = .scanning
+                    },
                     onOpenSettings: { showSettings = true }
                 )
             case .scanning:
@@ -39,6 +42,7 @@ struct RootView: View {
                         route = .home
                     },
                     onDone: {
+                        scanModel.finishCapturePreview()
                         scanModel.stop()
                         route = .review
                     }
@@ -57,6 +61,9 @@ struct RootView: View {
             }
         }
         .environmentObject(cloud)
+        .task {
+            await cloud.restoreLiveSessionsIfNeeded()
+        }
         .onOpenURL { url in
             _ = cloud.handleOpenURL(url)
         }

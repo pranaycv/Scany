@@ -229,7 +229,7 @@ final class GoogleDriveService: CloudFileStore {
         ])
         let (data, response) = try await CloudHTTP.send(request)
         try CloudHTTP.requireOK(data, response)
-        var next = try tokens(from: data)
+        var next = try self.tokens(from: data)
         if next.refreshToken == nil { next.refreshToken = refresh }
         try KeychainStore.setJSON(next, account: tokenAccount)
         return next

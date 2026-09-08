@@ -2,20 +2,8 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
-	<key>CFBundleDisplayName</key>
-	<string>Scany</string>
 	<key>CFBundleURLTypes</key>
 	<array>
-		<dict>
-			<key>CFBundleTypeRole</key>
-			<string>Editor</string>
-			<key>CFBundleURLName</key>
-			<string>com.pranaycv.Scany.msal</string>
-			<key>CFBundleURLSchemes</key>
-			<array>
-				<string>msauth.com.pranaycv.Scany</string>
-			</array>
-		</dict>
 		<dict>
 			<key>CFBundleTypeRole</key>
 			<string>Editor</string>
@@ -24,39 +12,23 @@
 			<key>CFBundleURLSchemes</key>
 			<array>
 				<string>scany</string>
-				<string>com.googleusercontent.apps.YOUR_GOOGLE_IOS_CLIENT_ID</string>
+				<string>com.googleusercontent.apps.425117208853-qor7i4st2nd6kq29t51bkaktbnvgct7g</string>
 			</array>
 		</dict>
 	</array>
 	<key>GIDClientID</key>
-	<string>YOUR_GOOGLE_IOS_CLIENT_ID.apps.googleusercontent.com</string>
+	<string>425117208853-qor7i4st2nd6kq29t51bkaktbnvgct7g.apps.googleusercontent.com</string>
 	<key>LSApplicationQueriesSchemes</key>
 	<array>
-		<string>msauthv2</string>
-		<string>msauthv3</string>
 		<string>googlegmail</string>
 		<string>googlechrome</string>
 	</array>
 	<key>MinimumOSVersion</key>
 	<string>15.0</string>
-	<key>NSCameraUsageDescription</key>
-	<string>Scany uses the camera to detect, straighten, and capture document pages.</string>
 	<key>UILaunchScreen</key>
 	<dict>
 		<key>UIColorName</key>
 		<string>LaunchBackground</string>
 	</dict>
-	<key>UIRequiredDeviceCapabilities</key>
-	<array>
-		<string>arm64</string>
-		<string>still-camera</string>
-		<string>auto-focus-camera</string>
-	</array>
-	<key>UISupportedInterfaceOrientations</key>
-	<array>
-		<string>UIInterfaceOrientationPortrait</string>
-	</array>
-	<key>UIRequiresFullScreen</key>
-	<true/>
 </dict>
 </plist>

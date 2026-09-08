@@ -1,6 +1,5 @@
 import CoreImage
 import Foundation
-import ImageIO
 import UIKit
 
 /// Shared CIContext and disk helpers for captured pages.
@@ -39,26 +38,28 @@ enum ScanImageFactory {
     }
 
     static func thumbnail(from image: CIImage, maxDimension: CGFloat = 240) -> UIImage? {
+        uiImage(from: downscaled(image, maxDimension: maxDimension))
+    }
+
+    static func downscaled(_ image: CIImage, maxDimension: CGFloat) -> CIImage {
         let extent = image.extent
         let longest = max(extent.width, extent.height)
-        let scale = longest > maxDimension ? maxDimension / longest : 1
-        let scaled = image.transformed(by: CGAffineTransform(scaleX: scale, y: scale))
-        return uiImage(from: scaled)
+        guard longest > maxDimension else { return image }
+        let scale = maxDimension / longest
+        var scaled = image.transformed(by: CGAffineTransform(scaleX: scale, y: scale))
+        if scaled.extent.origin != .zero {
+            scaled = scaled.transformed(
+                by: CGAffineTransform(
+                    translationX: -scaled.extent.origin.x,
+                    y: -scaled.extent.origin.y
+                )
+            )
+        }
+        return scaled
     }
 
     static func ciImage(from url: URL) -> CIImage? {
-        CIImage(contentsOf: url)
-    }
-
-    static func writeEnhanced(_ image: CIImage, id: UUID, directory: URL) -> URL? {
-        let enhanced = ImageEnhancer.enhance(image)
-        let url = directory.appendingPathComponent("\(id.uuidString)-enhanced.jpg")
-        do {
-            try writeJPEG(enhanced, to: url, quality: 0.9)
-            return url
-        } catch {
-            return nil
-        }
+        CIImage(contentsOf: url, options: [.applyOrientationProperty: true])
     }
 }
 

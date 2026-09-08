@@ -9,8 +9,8 @@ struct HomeView: View {
         ZStack {
             LinearGradient(
                 colors: [
-                    Color(red: 0.05, green: 0.07, blue: 0.12),
-                    Color(red: 0.08, green: 0.14, blue: 0.16)
+                    Color(red: 0.05, green: 0.07, blue: 0.14),
+                    Color(red: 0.08, green: 0.12, blue: 0.22)
                 ],
                 startPoint: .topLeading,
                 endPoint: .bottomTrailing
@@ -34,24 +34,27 @@ struct HomeView: View {
                 Spacer()
 
                 VStack(spacing: 18) {
-                    ZStack {
-                        Circle()
-                            .fill(ScanyTheme.accent.opacity(0.14))
-                            .frame(width: 108, height: 108)
-                        Image(systemName: "doc.viewfinder.fill")
-                            .font(.system(size: 46, weight: .semibold))
-                            .foregroundStyle(ScanyTheme.accent)
-                    }
+                    Image("AppLogo")
+                        .resizable()
+                        .scaledToFit()
+                        .frame(width: 108, height: 108)
+                        .clipShape(RoundedRectangle(cornerRadius: 24, style: .continuous))
+                        .shadow(color: ScanyTheme.accent.opacity(0.35), radius: 16, y: 6)
 
                     Text("Scany")
                         .font(.system(size: 42, weight: .bold, design: .rounded))
                         .foregroundStyle(.white)
 
-                    Text("Point at a page. Hold still. Scany captures it, straightens it, and uploads the PDF to Drive or OneDrive. Nothing is kept as a local library.")
-                        .font(.body)
-                        .foregroundStyle(.white.opacity(0.72))
-                        .multilineTextAlignment(.center)
-                        .padding(.horizontal, 28)
+                    VStack(spacing: 8) {
+                        Text("Cloud-first PDF")
+                            .font(.title3.weight(.semibold))
+                            .foregroundStyle(.white)
+                        Text("Save to Google Drive or iCloud, then clear the local pages.")
+                            .font(.body)
+                            .foregroundStyle(.white.opacity(0.72))
+                            .multilineTextAlignment(.center)
+                            .padding(.horizontal, 28)
+                    }
                 }
 
                 Spacer()
@@ -59,15 +62,6 @@ struct HomeView: View {
                 cloudStatus
                     .padding(.horizontal, 20)
                     .padding(.bottom, 14)
-
-                VStack(alignment: .leading, spacing: 12) {
-                    featureRow(icon: "viewfinder", title: "Live page detect", subtitle: "Vision finds the paper in any orientation.")
-                    featureRow(icon: "camera.metering.center.weighted", title: "Stabilize & auto-capture", subtitle: "No shutter tap required for each page.")
-                    featureRow(icon: "externaldrive.badge.icloud", title: "Cloud-first PDF", subtitle: "Save to Google Drive or OneDrive, then clear local pages.")
-                }
-                .padding(20)
-                .background(.white.opacity(0.06), in: RoundedRectangle(cornerRadius: 20, style: .continuous))
-                .padding(.horizontal, 20)
 
                 Button(action: onStartScan) {
                     Label("Start scan", systemImage: "camera.fill")
@@ -86,9 +80,9 @@ struct HomeView: View {
 
     @ViewBuilder
     private var cloudStatus: some View {
-        if cloud.google == nil && cloud.oneDrive == nil {
+        if cloud.google == nil && cloud.iCloud == nil {
             Button(action: onOpenSettings) {
-                Label("Connect Drive or OneDrive", systemImage: "cloud")
+                Label("Connect Drive or iCloud", systemImage: "icloud")
                     .font(.subheadline.weight(.semibold))
                     .frame(maxWidth: .infinity)
                     .padding(.vertical, 10)
@@ -103,10 +97,10 @@ struct HomeView: View {
                         subtitle: google.isSimulated ? "Sim" : google.account.email
                     )
                 }
-                if let oneDrive = cloud.oneDrive {
+                if let iCloud = cloud.iCloud {
                     statusChip(
-                        title: oneDrive.folder?.name ?? "OneDrive",
-                        subtitle: oneDrive.isSimulated ? "Sim" : oneDrive.account.email
+                        title: iCloud.folder?.name ?? "iCloud",
+                        subtitle: iCloud.isSimulated ? "Sim" : iCloud.account.email
                     )
                 }
             }
@@ -126,22 +120,5 @@ struct HomeView: View {
         .padding(.vertical, 8)
         .frame(maxWidth: .infinity, alignment: .leading)
         .background(.white.opacity(0.08), in: RoundedRectangle(cornerRadius: 10, style: .continuous))
-    }
-
-    private func featureRow(icon: String, title: String, subtitle: String) -> some View {
-        HStack(alignment: .top, spacing: 12) {
-            Image(systemName: icon)
-                .font(.title3)
-                .foregroundStyle(ScanyTheme.accent)
-                .frame(width: 28)
-            VStack(alignment: .leading, spacing: 2) {
-                Text(title)
-                    .font(.subheadline.weight(.semibold))
-                    .foregroundStyle(.white)
-                Text(subtitle)
-                    .font(.footnote)
-                    .foregroundStyle(.white.opacity(0.62))
-            }
-        }
     }
 }

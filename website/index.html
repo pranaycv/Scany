@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Scany — iPhone document scanner</title>
+  <meta name="description" content="Scany is an iPhone document scanner. Point at a page, hold still, and it captures, straightens, and saves a PDF to Google Drive or iCloud.">
+  <link rel="icon" href="/assets/logo.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+  <header class="wrap site-header">
+    <a class="brand" href="/">
+      <img src="/assets/logo.png" alt="Scany logo">
+      Scany
+    </a>
+    <nav class="nav">
+      <a href="/" aria-current="page">Home</a>
+      <a href="/privacy">Privacy</a>
+      <a href="/terms">Terms</a>
+      <a href="/support">Support</a>
+    </nav>
+  </header>
+
+  <main>
+    <section class="wrap hero">
+      <img src="/assets/logo.png" alt="">
+      <h1>Point. Hold still. Scan.</h1>
+      <p class="lede">Scany is a native iPhone document scanner. It finds the page in the camera, waits until the shot is steady, auto-captures, straightens the perspective, and uploads a PDF to the Google Drive or iCloud folder you choose.</p>
+      <div class="actions">
+        <a class="btn btn-primary" href="/privacy">Privacy policy</a>
+        <a class="btn btn-ghost" href="/support">Contact support</a>
+      </div>
+    </section>
+
+    <section class="wrap grid">
+      <article class="card">
+        <h2>Live page detect</h2>
+        <p>Vision finds the paper in any orientation. No need to square it up to the frame first.</p>
+      </article>
+      <article class="card">
+        <h2>Stabilize and capture</h2>
+        <p>Hold still for a moment. When the page is large enough and sharp, Scany captures automatically.</p>
+      </article>
+      <article class="card">
+        <h2>Cloud-first PDF</h2>
+        <p>Save to Google Drive or iCloud, then clear the local pages. Scany does not keep a document library on the phone.</p>
+      </article>
+    </section>
+
+    <section class="wrap panel">
+      <h2>Why Scany asks for Google Drive</h2>
+      <p>Scany uses Google Sign-In and the Drive API so you can export scans into a folder you pick. It requests only:</p>
+      <ul>
+        <li><code>drive.file</code> — files and folders this app creates or that you open with it</li>
+        <li><code>userinfo.email</code> — so Settings can show which Google account is connected</li>
+      </ul>
+      <p>Scany does not browse your existing Drive library, does not send Drive contents to advertising systems, and does not keep a copy of your scans after you upload and clear them. See the <a href="/privacy">privacy policy</a> for the full Limited Use disclosure.</p>
+      <p>You can also save to <strong>iCloud Drive</strong>. That uses the Apple ID already on the iPhone — no extra Google permission. PDFs show up in the Files app under iCloud Drive → Scany.</p>
+    </section>
+  </main>
+
+  <footer class="wrap site-footer">
+    <span>© 2026 Scany. iPhone app by Pranay.</span>
+    <span>
+      <a href="/privacy">Privacy</a> ·
+      <a href="/terms">Terms</a> ·
+      <a href="/support">Support</a>
+    </span>
+  </footer>
+</body>
+</html>

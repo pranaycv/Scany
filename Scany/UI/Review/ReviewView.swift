@@ -7,16 +7,19 @@ struct ReviewView: View {
     var onHome: () -> Void
     var onOpenSettings: () -> Void
 
-    @State private var isEnhancing = false
     @State private var isExporting = false
     @State private var exportURL: URL?
     @State private var exportError: String?
     @State private var selectedPageID: UUID?
     @State private var showShare = false
-    @State private var showProviderPicker = false
     @State private var folderProvider: CloudProvider?
     @State private var uploadResult: CloudUploadResult?
     @State private var showUploadSuccess = false
+    @State private var showPDFPreview = false
+    @State private var confirmDiscard = false
+    @FocusState private var isEditingFileName: Bool
+    @AppStorage("scany.appendDateTimeToFileName") private var appendDateTime = false
+    @State private var selectedSaveProvider: CloudProvider?
 
     private var isPagePresented: Binding<Bool> {
         Binding(
@@ -35,35 +38,55 @@ struct ReviewView: View {
                 } else {
                     pageList
                 }
+
+                if isExporting || model.isRefreshingPages {
+                    processingOverlay
+                }
             }
-            .navigationTitle(model.document.title)
+            .navigationTitle("Pages")
             .navigationBarTitleDisplayMode(.inline)
             .scanyToolbarChrome()
             .toolbar {
                 ToolbarItem(placement: .navigationBarLeading) {
-                    Button("Home", action: onHome)
+                    Button("Home") {
+                        if model.document.pages.isEmpty {
+                            onHome()
+                        } else {
+                            confirmDiscard = true
+                        }
+                    }
                 }
-                ToolbarItem(placement: .navigationBarTrailing) {
-                    EditButton()
-                        .disabled(model.document.pages.isEmpty)
+                ToolbarItemGroup(placement: .keyboard) {
+                    Spacer()
+                    Button("Done") { isEditingFileName = false }
+                        .foregroundStyle(ScanyTheme.accent)
                 }
             }
-            .safeAreaInset(edge: .bottom) { bottomActions }
+            .alert("Discard this scan?", isPresented: $confirmDiscard) {
+                Button("Keep pages", role: .cancel) {}
+                Button("Discard", role: .destructive, action: onHome)
+            } message: {
+                Text("\(model.document.pages.count) page(s) will be deleted.")
+            }
+            .safeAreaInset(edge: .bottom) {
+                if !isEditingFileName {
+                    bottomActions
+                }
+            }
             .sheet(isPresented: $showShare) {
                 if let exportURL = exportURL {
                     ActivityShareSheet(items: [exportURL])
                 }
             }
-            .sheet(item: $folderProvider) { provider in
-                CloudFolderPickerView(cloud: cloud, provider: provider)
-            }
-            .confirmationDialog("Save PDF to", isPresented: $showProviderPicker, titleVisibility: .visible) {
-                ForEach(cloud.readyProviders) { provider in
-                    Button(provider.saveActionTitle) {
-                        Task { await saveToCloud(provider) }
+            .sheet(isPresented: $showPDFPreview) {
+                if let exportURL {
+                    PDFPreviewView(url: exportURL, title: "Document preview") {
+                        showPDFPreview = false
                     }
                 }
-                Button("Cancel", role: .cancel) {}
+            }
+            .sheet(item: $folderProvider) { provider in
+                CloudFolderPickerView(cloud: cloud, provider: provider)
             }
             .alert("Could not export", isPresented: Binding(
                 get: { exportError != nil && !showUploadSuccess },
@@ -77,6 +100,10 @@ struct ReviewView: View {
             .background(ios15PushLink)
             .scanyNavigationDestination(isPresented: isPagePresented) {
                 pagePreview
+            }
+            .onAppear { syncSelectedProvider() }
+            .scanyOnChange(of: cloud.readyProviders.map(\.id).joined()) { _ in
+                syncSelectedProvider()
             }
         }
     }
@@ -131,9 +158,14 @@ struct ReviewView: View {
 
     @ViewBuilder
     private var pagePreview: some View {
-        if let id = selectedPageID,
-           let page = model.document.pages.first(where: { $0.id == id }) {
-            PagePreviewView(page: page, enhanced: model.document.autoEnhanceAllPages)
+        if let id = selectedPageID {
+            ReviewPagePreviewView(
+                model: model,
+                pageID: Binding(
+                    get: { selectedPageID ?? id },
+                    set: { selectedPageID = $0 }
+                )
+            )
         } else {
             Text("Page unavailable")
                 .foregroundStyle(.white)
@@ -156,35 +188,25 @@ struct ReviewView: View {
     }
 
     private var pageList: some View {
-        List {
-            Section {
-                enhanceCard
-            }
-            .listRowInsets(EdgeInsets(top: 12, leading: 16, bottom: 8, trailing: 16))
-            .listRowBackground(Color.clear)
-
-            Section("Pages") {
+        VStack(spacing: 0) {
+            fileNameBar
+            dateTimeRow
+            destinationRow
+            List {
                 ForEach(Array(model.document.pages.enumerated()), id: \.element.id) { index, page in
                     Button {
                         selectedPageID = page.id
                     } label: {
-                        HStack(spacing: 14) {
+                        HStack(spacing: 12) {
                             Image(uiImage: page.thumbnail)
                                 .resizable()
                                 .scaledToFill()
-                                .frame(width: 54, height: 72)
-                                .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
+                                .frame(width: 44, height: 58)
+                                .clipShape(RoundedRectangle(cornerRadius: 7, style: .continuous))
 
-                            VStack(alignment: .leading, spacing: 4) {
-                                Text("Page \(index + 1)")
-                                    .font(.headline)
-                                    .foregroundStyle(.white)
-                                Text(page.enhancedURL != nil && model.document.autoEnhanceAllPages
-                                     ? "Enhanced"
-                                     : "Original")
-                                    .font(.caption)
-                                    .foregroundStyle(.white.opacity(0.55))
-                            }
+                            Text("Page \(index + 1)")
+                                .font(.headline)
+                                .foregroundStyle(.white)
                             Spacer()
                             Image(systemName: "chevron.right")
                                 .font(.caption.weight(.semibold))
@@ -196,116 +218,204 @@ struct ReviewView: View {
                     let ids = offsets.map { model.document.pages[$0].id }
                     ids.forEach { model.deletePage(id: $0) }
                 }
-                .onMove(perform: model.movePages)
             }
+            .scanyHideListBackground()
+            .listStyle(.plain)
         }
-        .scanyHideListBackground()
-        .listStyle(.insetGrouped)
     }
 
-    private var enhanceCard: some View {
-        VStack(alignment: .leading, spacing: 12) {
-            HStack {
-                Image(systemName: "wand.and.stars")
+    private var fileNameBar: some View {
+        VStack(alignment: .leading, spacing: 6) {
+            HStack(spacing: 8) {
+                Image(systemName: "pencil")
                     .foregroundStyle(ScanyTheme.accent)
-                Text("Auto-enhance")
-                    .font(.headline)
-                    .foregroundStyle(.white)
-                Spacer()
+                TextField("File name", text: titleBinding)
+                    .foregroundColor(.white)
+                    .disableAutocorrection(true)
+                    .autocapitalization(.none)
+                    .submitLabel(.done)
+                    .focused($isEditingFileName)
+                    .onSubmit { isEditingFileName = false }
+                Text(".pdf")
+                    .font(.subheadline.weight(.semibold))
+                    .foregroundStyle(.white.opacity(0.45))
             }
+            .padding(.horizontal, 14)
+            .padding(.vertical, 10)
+            .background(Color.white.opacity(0.08), in: RoundedRectangle(cornerRadius: 12, style: .continuous))
 
-            Text("Boost contrast and sharpness on every page. Turn it on once — Scany applies it to this whole document, including pages you capture next.")
-                .font(.footnote)
-                .foregroundStyle(.white.opacity(0.65))
-                .fixedSize(horizontal: false, vertical: true)
+            if !exportFileName.isEmpty {
+                Text("\(exportFileName).pdf")
+                    .font(.caption)
+                    .foregroundStyle(.white.opacity(0.5))
+                    .padding(.horizontal, 4)
+            }
+        }
+        .padding(.horizontal, 16)
+        .padding(.top, 8)
+        .padding(.bottom, 8)
+    }
 
-            Toggle(
-                model.document.autoEnhanceAllPages ? "Enhancement on for all pages" : "Auto-enhance all pages",
-                isOn: enhanceBinding
-            )
+    private var dateTimeRow: some View {
+        Toggle("Add date and time", isOn: $appendDateTime)
             .tint(ScanyTheme.accent)
             .foregroundStyle(.white)
-            .disabled(isEnhancing)
-
-            if isEnhancing {
-                ProgressView("Enhancing pages…")
-                    .progressViewStyle(.circular)
-                    .tint(ScanyTheme.accent)
-                    .foregroundStyle(.white)
-            }
-        }
-        .padding(16)
-        .background(Color.white.opacity(0.06), in: RoundedRectangle(cornerRadius: 16, style: .continuous))
+            .padding(.horizontal, 16)
+            .padding(.vertical, 6)
     }
 
-    private var enhanceBinding: Binding<Bool> {
-        Binding(
-            get: { model.document.autoEnhanceAllPages },
-            set: { enabled in
-                if enabled {
-                    isEnhancing = true
-                    Task {
-                        await model.applyAutoEnhanceToAllPages()
-                        isEnhancing = false
+    @ViewBuilder
+    private var destinationRow: some View {
+        if cloud.readyProviders.count > 1 {
+            VStack(alignment: .leading, spacing: 8) {
+                Text("Save to")
+                    .font(.caption.weight(.semibold))
+                    .foregroundStyle(.white.opacity(0.55))
+                HStack(spacing: 8) {
+                    ForEach(cloud.readyProviders) { provider in
+                        Button {
+                            selectedSaveProvider = provider
+                        } label: {
+                            Label(provider.displayName, systemImage: provider.systemImage)
+                                .font(.subheadline.weight(.semibold))
+                                .frame(maxWidth: .infinity)
+                                .padding(.vertical, 10)
+                                .background(
+                                    selectedSaveProvider == provider
+                                        ? ScanyTheme.accent
+                                        : Color.white.opacity(0.1),
+                                    in: RoundedRectangle(cornerRadius: 12, style: .continuous)
+                                )
+                                .foregroundStyle(selectedSaveProvider == provider ? ScanyTheme.ink : .white)
+                        }
                     }
-                } else {
-                    model.disableAutoEnhance()
                 }
             }
+            .padding(.horizontal, 16)
+            .padding(.bottom, 8)
+        }
+    }
+
+    private var exportFileName: String {
+        ScanDocument.makeExportFileName(
+            title: model.document.title,
+            appendDateTime: appendDateTime
         )
     }
 
+    private var canSaveToCloud: Bool {
+        !model.document.pages.isEmpty && !isExporting && !exportFileName.isEmpty
+    }
+
+    private var titleBinding: Binding<String> {
+        Binding(
+            get: { model.document.title },
+            set: { model.setDocumentTitle($0) }
+        )
+    }
+
+    private var processingOverlay: some View {
+        ZStack {
+            Color.black.opacity(0.5).ignoresSafeArea()
+            VStack(spacing: 14) {
+                ProgressView()
+                    .progressViewStyle(.circular)
+                    .tint(ScanyTheme.accent)
+                    .scaleEffect(1.2)
+                Text(model.isRefreshingPages ? "Straightening pages…" : "Preparing PDF…")
+                    .font(.subheadline.weight(.semibold))
+                    .foregroundStyle(.white)
+            }
+            .padding(28)
+            .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 18, style: .continuous))
+        }
+        .allowsHitTesting(true)
+    }
+
     private var bottomActions: some View {
-        VStack(spacing: 10) {
+        VStack(spacing: 8) {
             Button {
                 Task { await handlePrimarySave() }
             } label: {
-                HStack {
-                    if isExporting {
-                        ProgressView().tint(ScanyTheme.ink)
-                    } else {
-                        Image(systemName: "externaldrive.badge.icloud")
-                    }
-                    Text(isExporting ? "Saving…" : primarySaveTitle)
-                        .font(.headline)
+                label(primarySaveTitle, systemImage: "externaldrive.badge.icloud")
+                    .background(ScanyTheme.accent, in: Capsule())
+                    .foregroundStyle(ScanyTheme.ink)
+            }
+            .disabled(!canSaveToCloud)
+
+            if !model.document.pages.isEmpty && exportFileName.isEmpty {
+                Text("Enter a file name or turn on Add date and time.")
+                    .font(.caption)
+                    .foregroundStyle(.white.opacity(0.55))
+            }
+
+            HStack(spacing: 8) {
+                compactAction("Preview", systemImage: "doc.text.magnifyingglass") {
+                    Task { await previewPDF() }
                 }
-                .frame(maxWidth: .infinity)
-                .padding(.vertical, 14)
-                .background(ScanyTheme.accent, in: Capsule())
-                .foregroundStyle(ScanyTheme.ink)
-            }
-            .disabled(model.document.pages.isEmpty || isExporting)
+                .disabled(model.document.pages.isEmpty || isExporting)
 
-            Button {
-                Task { await sharePDF() }
-            } label: {
-                Text("Share another way…")
-                    .font(.subheadline.weight(.semibold))
-                    .foregroundStyle(.white.opacity(0.8))
-            }
-            .disabled(model.document.pages.isEmpty || isExporting)
+                compactAction("Share", systemImage: "square.and.arrow.up") {
+                    Task { await sharePDF() }
+                }
+                .disabled(model.document.pages.isEmpty || isExporting)
 
-            Button("Scan more pages", action: onRescan)
-                .font(.subheadline.weight(.semibold))
-                .foregroundStyle(ScanyTheme.accent)
+                compactAction("Scan more", systemImage: "plus.viewfinder") {
+                    onRescan()
+                }
+                .disabled(isExporting)
+            }
         }
-        .padding(.horizontal, 20)
-        .padding(.top, 10)
-        .padding(.bottom, 16)
+        .padding(.horizontal, 16)
+        .padding(.top, 8)
+        .padding(.bottom, 10)
         .background(.ultraThinMaterial)
     }
 
+    private func label(_ title: String, systemImage: String) -> some View {
+        HStack {
+            Image(systemName: systemImage)
+            Text(title)
+                .font(.headline)
+        }
+        .frame(maxWidth: .infinity)
+        .padding(.vertical, 12)
+    }
+
+    private func compactAction(_ title: String, systemImage: String, action: @escaping () -> Void) -> some View {
+        Button(action: action) {
+            VStack(spacing: 4) {
+                Image(systemName: systemImage)
+                    .font(.body.weight(.semibold))
+                Text(title)
+                    .font(.caption.weight(.semibold))
+            }
+            .frame(maxWidth: .infinity)
+            .padding(.vertical, 10)
+            .background(Color.white.opacity(0.1), in: RoundedRectangle(cornerRadius: 12, style: .continuous))
+            .foregroundStyle(.white)
+        }
+    }
+
     private var primarySaveTitle: String {
+        if cloud.readyProviders.count > 1, let selectedSaveProvider {
+            return selectedSaveProvider.saveActionTitle
+        }
         if let provider = cloud.preferredUploadProvider {
             return provider.saveActionTitle
-        }
-        if cloud.readyProviders.count > 1 {
-            return "Save to cloud"
         }
         if !cloud.connectedProviders.isEmpty {
             return "Choose a folder"
         }
         return "Connect cloud to save"
+    }
+
+    private func syncSelectedProvider() {
+        let ready = cloud.readyProviders
+        if let selectedSaveProvider, ready.contains(selectedSaveProvider) {
+            return
+        }
+        selectedSaveProvider = cloud.preferredUploadProvider ?? ready.first
     }
 
     private func handlePrimarySave() async {
@@ -317,18 +427,26 @@ struct ReviewView: View {
             onOpenSettings()
             return
         }
-        if let provider = cloud.preferredUploadProvider {
+        guard canSaveToCloud else {
+            exportError = "Enter a file name or turn on Add date and time."
+            return
+        }
+        if cloud.readyProviders.count > 1 {
+            let provider = selectedSaveProvider ?? cloud.preferredUploadProvider ?? cloud.readyProviders[0]
+            selectedSaveProvider = provider
             await saveToCloud(provider)
             return
         }
-        showProviderPicker = true
+        if let provider = cloud.readyProviders.first {
+            await saveToCloud(provider)
+        }
     }
 
     private func saveToCloud(_ provider: CloudProvider) async {
         isExporting = true
         defer { isExporting = false }
         do {
-            let pdf = try await buildPDF()
+            let pdf = try await model.exportPDF()
             exportURL = pdf
             let result = try await cloud.upload(
                 pdfURL: pdf,
@@ -346,7 +464,7 @@ struct ReviewView: View {
         isExporting = true
         defer { isExporting = false }
         do {
-            let url = try await buildPDF()
+            let url = try await model.exportPDF()
             exportURL = url
             showShare = true
         } catch {
@@ -354,43 +472,14 @@ struct ReviewView: View {
         }
     }
 
-    private func buildPDF() async throws -> URL {
-        let title = model.document.title
-        let directory = model.document.storageDirectory
-        let pageURLs: [URL] = model.document.pages.map { page in
-            (model.document.autoEnhanceAllPages ? page.enhancedURL : nil) ?? page.originalURL
+    private func previewPDF() async {
+        isExporting = true
+        defer { isExporting = false }
+        do {
+            exportURL = try await model.exportPDF()
+            showPDFPreview = true
+        } catch {
+            exportError = error.localizedDescription
         }
-        return try await Task.detached {
-            try PDFExporter.export(
-                title: title,
-                pageImageURLs: pageURLs,
-                outputDirectory: directory
-            )
-        }.value
-    }
-}
-
-struct PagePreviewView: View {
-    let page: ScannedPage
-    let enhanced: Bool
-
-    var body: some View {
-        ZStack {
-            ScanyTheme.ink.ignoresSafeArea()
-            if let image = page.displayImage(enhanced: enhanced) {
-                ScrollView([.horizontal, .vertical]) {
-                    Image(uiImage: image)
-                        .resizable()
-                        .scaledToFit()
-                        .padding()
-                }
-            } else {
-                Text("Could not load this page.")
-                    .foregroundStyle(.white)
-            }
-        }
-        .navigationTitle("Page")
-        .navigationBarTitleDisplayMode(.inline)
-        .scanyToolbarChrome()
     }
 }

@@ -33,11 +33,11 @@ final class CameraPreviewUIView: UIView {
         dim.fillRule = .evenOdd
         layer.addSublayer(dim)
 
-        fill.fillColor = UIColor.systemTeal.withAlphaComponent(0.12).cgColor
+        fill.fillColor = ScanyTheme.accentUIColor.withAlphaComponent(0.12).cgColor
         layer.addSublayer(fill)
 
         overlay.fillColor = UIColor.clear.cgColor
-        overlay.strokeColor = UIColor.systemTeal.cgColor
+        overlay.strokeColor = ScanyTheme.accentUIColor.cgColor
         overlay.lineWidth = 3
         overlay.lineJoin = .round
         overlay.lineCap = .round
@@ -71,14 +71,19 @@ final class CameraPreviewUIView: UIView {
     }
 
     func updateOverlay(quad: DocumentQuad?, color: UIColor, emphasized: Bool) {
-        guard let quad, let camera else {
+        guard let quad, quad.isPageRectangle, let camera else {
             overlay.path = nil
             fill.path = nil
             dim.path = nil
             return
         }
 
-        let points = quad.corners.map { camera.convertToLayer($0) }
+        // Keep the preview layer in sync before converting — SwiftUI can call
+        // updateUIView before layoutSubviews on the first frame.
+        camera.previewLayer.frame = bounds
+
+        let displayQuad = quad.contracted(by: 0.012)
+        let points = displayQuad.corners.map { camera.convertToLayer($0) }
         guard points.count == 4 else { return }
 
         let path = UIBezierPath()

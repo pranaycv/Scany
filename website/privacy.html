@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Privacy Policy — Scany</title>
+  <meta name="description" content="Privacy policy for the Scany iPhone app, including how Google Drive and iCloud are used.">
+  <link rel="icon" href="/assets/logo.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+  <header class="wrap site-header">
+    <a class="brand" href="/">
+      <img src="/assets/logo.png" alt="Scany logo">
+      Scany
+    </a>
+    <nav class="nav">
+      <a href="/">Home</a>
+      <a href="/privacy" aria-current="page">Privacy</a>
+      <a href="/terms">Terms</a>
+      <a href="/support">Support</a>
+    </nav>
+  </header>
+
+  <main class="wrap legal">
+    <h1>Privacy Policy</h1>
+    <p class="meta">Effective September 6, 2026 · Scany for iPhone (bundle ID <code>com.prnysoni.Scany</code>)</p>
+
+    <p>Scany is a document scanner. It captures pages with the camera, builds a PDF, and uploads that PDF to a cloud folder you choose. This policy describes what the app uses, what it does not collect, and how Google user data is handled.</p>
+
+    <h2>Who is responsible</h2>
+    <p>Scany is developed by Pranay. Questions: <a href="mailto:prnysoni@gmail.com">prnysoni@gmail.com</a>.</p>
+
+    <h2>Data Scany uses on your device</h2>
+    <ul>
+      <li><strong>Camera.</strong> Used only to preview pages, detect paper edges, and capture scans. Frames are processed on-device. The app does not upload live video.</li>
+      <li><strong>Temporary scan files.</strong> Captured pages are stored in a temporary session folder on the phone while you scan and review. After a successful upload you can clear them. Scany does not keep a library of past scans.</li>
+      <li><strong>Account tokens.</strong> After you connect Google Drive, access tokens are stored in the iOS Keychain so you do not have to sign in every time. Disconnecting deletes those tokens from the app. iCloud uses the iCloud account already signed in on the iPhone; Scany does not receive your Apple ID password.</li>
+      <li><strong>Chosen folder.</strong> The destination folder you pick is remembered locally so later exports can go to the same place.</li>
+    </ul>
+    <p>Scany’s privacy manifest declares that it does not track you and does not collect Apple-defined data types for analytics or advertising.</p>
+
+    <h2>Google user data</h2>
+    <p>If you tap <strong>Connect Google Drive</strong>, Scany requests:</p>
+    <ul>
+      <li><code>https://www.googleapis.com/auth/drive.file</code> — create folders, list folders this app can use, and upload PDF files the app created</li>
+      <li><code>https://www.googleapis.com/auth/userinfo.email</code> — show your Google account email in Settings</li>
+    </ul>
+    <p>That access is used only to:</p>
+    <ul>
+      <li>Sign you in and display which account is connected</li>
+      <li>Let you pick or create a Drive folder</li>
+      <li>Upload the PDF you just scanned into that folder</li>
+    </ul>
+    <p>Scany does not read unrelated files in your Drive, does not share your Google data with other apps, and does not use it to train models or to advertise.</p>
+
+    <h2>Google API Services User Data Policy — Limited Use</h2>
+    <p>Scany’s use of information received from Google APIs adheres to the <a href="https://developers.google.com/terms/api-services-user-data-policy">Google API Services User Data Policy</a>, including the Limited Use requirements. In particular:</p>
+    <ul>
+      <li>Google user data is used only to provide or improve user-facing features that are prominent in the app (Drive sign-in, folder choice, and PDF upload).</li>
+      <li>Google user data is not transferred to others except as necessary to operate those features, to comply with law, or with your direction (for example, uploading a file into your Drive).</li>
+      <li>Google user data is not used for serving advertisements.</li>
+      <li>Google user data is not sold.</li>
+      <li>Human access to Google user data is limited to cases such as investigating a bug you report, security review, or legal obligation — not routine reading of your scans.</li>
+    </ul>
+
+    <h2>iCloud Drive</h2>
+    <p>If you connect iCloud, Scany asks you to pick a folder in the Files app (typically under iCloud Drive). PDFs are written only into that folder. Apple stores those files under your iCloud account. Disconnecting in Scany stops future uploads; it does not delete files already in iCloud.</p>
+
+    <h2>What we do not do</h2>
+    <ul>
+      <li>No analytics SDK, advertising SDK, or crash-reporter that ships scan contents off-device</li>
+      <li>No photo library requirement — cloud upload is the primary export</li>
+      <li>No account of our own: you sign in to Google or use the iCloud account on the iPhone, not a Scany server</li>
+    </ul>
+    <p>Scany does not operate a backend that stores your documents. Files go from your iPhone to the cloud provider you selected.</p>
+
+    <h2>Retention</h2>
+    <p>Temporary page images remain until you upload and clear the session, or discard the scan. Cloud copies then live in your Google Drive or iCloud Drive under that provider’s retention rules. You can delete those files there at any time. Disconnecting Scany from Drive or iCloud stops future uploads; it does not delete files already saved.</p>
+
+    <h2>Children</h2>
+    <p>Scany is not directed at children under 13, and we do not knowingly collect personal information from children.</p>
+
+    <h2>Changes</h2>
+    <p>If this policy changes, the updated text will be posted at this URL with a new effective date.</p>
+
+    <h2>Contact</h2>
+    <p><a href="mailto:prnysoni@gmail.com">prnysoni@gmail.com</a></p>
+  </main>
+
+  <footer class="wrap site-footer">
+    <span>© 2026 Scany</span>
+    <span>
+      <a href="/">Home</a> ·
+      <a href="/terms">Terms</a> ·
+      <a href="/support">Support</a>
+    </span>
+  </footer>
+</body>
+</html>

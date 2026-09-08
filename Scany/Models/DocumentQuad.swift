@@ -39,4 +39,178 @@ struct DocumentQuad: Equatable, Sendable {
         let height = max((left + right) / 2, 0.05)
         return CGSize(width: width, height: height)
     }
+
+    /// True when this looks like the same sheet still sitting in the viewfinder.
+    func isLikelySamePage(as other: DocumentQuad) -> Bool {
+        jitter(to: other) < 0.16 && abs(fillRatio - other.fillRatio) < 0.14
+    }
+
+    /// True when the four corners form a page rectangle: opposite edges stay
+    /// parallel on the page, with enough slack for camera perspective. One
+    /// runaway corner fails until QuadCorrector rebuilds it from the other three.
+    var isPageRectangle: Bool {
+        guard isConvex else { return false }
+
+        let pts = corners
+        var lengths: [CGFloat] = []
+        lengths.reserveCapacity(4)
+        for index in 0..<4 {
+            let a = pts[index]
+            let b = pts[(index + 1) % 4]
+            lengths.append(hypot(b.x - a.x, b.y - a.y))
+        }
+        guard let minEdge = lengths.min(), let maxEdge = lengths.max(),
+              minEdge > 0.045, maxEdge / minEdge < 4.8
+        else { return false }
+
+        func sideRatio(_ a: CGFloat, _ b: CGFloat) -> CGFloat {
+            max(a, b) / max(min(a, b), 0.0001)
+        }
+        guard sideRatio(lengths[0], lengths[2]) < 1.65,
+              sideRatio(lengths[1], lengths[3]) < 1.65
+        else { return false }
+
+        var dirs: [CGPoint] = []
+        dirs.reserveCapacity(4)
+        for index in 0..<4 {
+            let a = pts[index]
+            let b = pts[(index + 1) % 4]
+            let length = lengths[index]
+            dirs.append(CGPoint(x: (b.x - a.x) / length, y: (b.y - a.y) / length))
+        }
+        let oppositeAlign0 = abs(dirs[0].x * dirs[2].x + dirs[0].y * dirs[2].y)
+        let oppositeAlign1 = abs(dirs[1].x * dirs[3].x + dirs[1].y * dirs[3].y)
+        guard oppositeAlign0 > 0.45, oppositeAlign1 > 0.45 else { return false }
+
+        let maxSkew = 36 * CGFloat.pi / 180
+        for index in 0..<4 {
+            let previous = pts[(index + 3) % 4]
+            let point = pts[index]
+            let next = pts[(index + 1) % 4]
+            let angle = abs(interiorAngle(at: point, from: previous, to: next))
+            if abs(angle - .pi / 2) > maxSkew {
+                return false
+            }
+        }
+
+        let center = CGPoint(
+            x: pts.map(\.x).reduce(0, +) / 4,
+            y: pts.map(\.y).reduce(0, +) / 4
+        )
+        let radii = pts.map { hypot($0.x - center.x, $0.y - center.y) }
+        let sortedRadii = radii.sorted()
+        let medianRadius = (sortedRadii[1] + sortedRadii[2]) / 2
+        guard medianRadius > 0.04 else { return false }
+        if radii.contains(where: { $0 > medianRadius * 1.50 || $0 < medianRadius * 0.58 }) {
+            return false
+        }
+
+        let sortedLengths = lengths.sorted()
+        let typicalEdge = (sortedLengths[1] + sortedLengths[2]) / 2
+        let quadScale = max(typicalEdge, medianRadius * 2)
+        for index in 0..<4 {
+            let others = pts.enumerated().compactMap { $0.offset == index ? nil : $0.element }
+            let xs = others.map(\.x)
+            let ys = others.map(\.y)
+            guard let minX = xs.min(), let maxX = xs.max(),
+                  let minY = ys.min(), let maxY = ys.max()
+            else { return false }
+            let point = pts[index]
+            let dx = max(minX - point.x, 0, point.x - maxX)
+            let dy = max(minY - point.y, 0, point.y - maxY)
+            if hypot(dx, dy) > quadScale * 0.14 {
+                return false
+            }
+        }
+        return true
+    }
+
+    var isConvex: Bool {
+        let pts = corners
+        var sign: CGFloat = 0
+        for index in 0..<4 {
+            let a = pts[index]
+            let b = pts[(index + 1) % 4]
+            let c = pts[(index + 2) % 4]
+            let cross = (b.x - a.x) * (c.y - b.y) - (b.y - a.y) * (c.x - b.x)
+            if abs(cross) < 1e-7 { continue }
+            if sign == 0 {
+                sign = cross
+            } else if sign * cross < 0 {
+                return false
+            }
+        }
+        return true
+    }
+
+    private func interiorAngle(at vertex: CGPoint, from previous: CGPoint, to next: CGPoint) -> CGFloat {
+        let v1 = CGPoint(x: previous.x - vertex.x, y: previous.y - vertex.y)
+        let v2 = CGPoint(x: next.x - vertex.x, y: next.y - vertex.y)
+        return atan2(v1.x * v2.y - v1.y * v2.x, v1.x * v2.x + v1.y * v2.y)
+    }
+
+    /// Reorders corners so "top" is toward the top of the camera image (the
+    /// phone's notch / top edge), not Vision's guess or the printed text.
+    func alignedToImageUp() -> DocumentQuad {
+        let sortedByY = corners.sorted { $0.y > $1.y }
+        guard sortedByY.count == 4 else { return self }
+        let top = Array(sortedByY.prefix(2)).sorted { $0.x < $1.x }
+        let bottom = Array(sortedByY.suffix(2)).sorted { $0.x < $1.x }
+        return DocumentQuad(
+            topLeft: top[0],
+            topRight: top[1],
+            bottomRight: bottom[1],
+            bottomLeft: bottom[0],
+            confidence: confidence,
+            boundingBox: boundingBox
+        )
+    }
+
+    static func fallbackFullFrame(inset: CGFloat = 0.08) -> DocumentQuad {
+        let minV = inset
+        let maxV = 1 - inset
+        return DocumentQuad(
+            topLeft: CGPoint(x: minV, y: maxV),
+            topRight: CGPoint(x: maxV, y: maxV),
+            bottomRight: CGPoint(x: maxV, y: minV),
+            bottomLeft: CGPoint(x: minV, y: minV),
+            confidence: 0.2,
+            boundingBox: CGRect(x: minV, y: minV, width: maxV - minV, height: maxV - minV)
+        )
+    }
+
+    func withBoundingBoxFromCorners() -> DocumentQuad {
+        let xs = corners.map(\.x)
+        let ys = corners.map(\.y)
+        guard let minX = xs.min(), let maxX = xs.max(),
+              let minY = ys.min(), let maxY = ys.max()
+        else { return self }
+        var copy = self
+        copy.boundingBox = CGRect(x: minX, y: minY, width: maxX - minX, height: maxY - minY)
+        return copy
+    }
+
+    func contracted(by fraction: CGFloat) -> DocumentQuad {
+        let amount = min(max(fraction, 0), 0.2)
+        guard amount > 0 else { return self }
+        let cx = (topLeft.x + topRight.x + bottomRight.x + bottomLeft.x) / 4
+        let cy = (topLeft.y + topRight.y + bottomRight.y + bottomLeft.y) / 4
+        func pull(_ point: CGPoint) -> CGPoint {
+            CGPoint(
+                x: point.x + (cx - point.x) * amount,
+                y: point.y + (cy - point.y) * amount
+            )
+        }
+        return DocumentQuad(
+            topLeft: pull(topLeft),
+            topRight: pull(topRight),
+            bottomRight: pull(bottomRight),
+            bottomLeft: pull(bottomLeft),
+            confidence: confidence,
+            boundingBox: boundingBox.insetBy(
+                dx: boundingBox.width * amount * 0.5,
+                dy: boundingBox.height * amount * 0.5
+            )
+        )
+    }
 }

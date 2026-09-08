@@ -38,7 +38,7 @@ Test scanning on a real iPhone 12 or newer. The Simulator will show the home scr
 3. Hold still for about **0.7s**. When the page is large enough and not too blurry, Scany captures automatically (shutter sound + haptic), then looks for the next page.
 4. The shutter button is optional — use it only if auto-capture does not fire.
 5. Thumbnails along the bottom show the session. Long-press a thumbnail to delete.
-6. Tap **Done** when finished. On the review screen you can delete / reorder pages, turn on **Auto-enhance all pages**, then **Save to Drive** / **Save to OneDrive**. After a successful upload, clear the local page images. System share sheet remains a secondary fallback. There is **no on-device document library**.
+6. Tap **Done** when finished. On the review screen you can delete / reorder pages, turn on **Auto-enhance all pages**, then **Save to Drive** / **Save to iCloud**. After a successful upload, clear the local page images. System share sheet remains a secondary fallback. There is **no on-device document library**.
 
 Guidance shown in-camera:
 
@@ -55,7 +55,7 @@ Cancel mid-session asks to discard if any pages exist.
 ## Architecture
 
 ```
-HomeView → ScanSessionView → ReviewView → Drive / OneDrive (share sheet fallback)
+HomeView → ScanSessionView → ReviewView → Drive / iCloud (share sheet fallback)
                 │
                 ├─ CameraSession          AVCaptureSession (video + photo)
                 ├─ DocumentDetector       VNDetectDocumentSegmentationRequest
@@ -66,7 +66,7 @@ HomeView → ScanSessionView → ReviewView → Drive / OneDrive (share sheet fa
                 ├─ ImageEnhancer          CIDocumentEnhancer + contrast + unsharp
                 ├─ PageCaptureProcessor   Warp + upright + write JPEG
                 ├─ PDFExporter            UIGraphicsPDFRenderer
-                └─ CloudManager           Google Drive API v3 + Microsoft Graph
+                └─ CloudManager           Google Drive API v3 + iCloud Drive
 ```
 
 | Piece | Role |
@@ -81,7 +81,7 @@ HomeView → ScanSessionView → ReviewView → Drive / OneDrive (share sheet fa
 | `Export/PDFExporter.swift` | Multi-page PDF builder |
 | `Cloud/CloudManager.swift` | Connect accounts, remember folder, upload, disconnect |
 | `Cloud/GoogleDriveService.swift` | Google Sign-In (SPM) or PKCE + Drive API v3 |
-| `Cloud/OneDriveService.swift` | MSAL (SPM) or PKCE + Microsoft Graph |
+| `Cloud/ICloudDriveService.swift` | iCloud Drive Documents container (`iCloud Drive → Scany`) |
 | `Cloud/SimulatedCloudStore.swift` | Sandbox upload when client IDs are still placeholders |
 | `UI/Scan/ScanViewModel.swift` | Ephemeral session only — pages are cleared after upload |
 
@@ -97,7 +97,7 @@ Scany/
   Info.plist              Display name, camera usage, iOS 15 minimum, arm64
   PrivacyInfo.xcprivacy   Privacy manifest
   Assets.xcassets/        App icon + accent
-  Cloud/                  Drive + OneDrive + Keychain + Config placeholders
+  Cloud/                  Drive + iCloud + Keychain
   Camera/ Detection/ Processing/ Export/ Models/ UI/
 ```
 
@@ -105,28 +105,27 @@ Display name: **Scany**. iPhone only, **iOS 15.0+**, arm64, SwiftUI, Swift 5.
 
 The project does **not** require iOS 17. SwiftUI APIs that shipped later (`NavigationStack`, `navigationDestination`, two-parameter `onChange`, `scrollContentBackground`, `UIColor(Color)`) are `#available`-gated with iOS 15/16 fallbacks in `UI/Compatibility.swift`. Document detection uses Vision segmentation on iOS 15+, with `VNDetectRectanglesRequest` as the real fallback when no page quad is returned.
 
-## Cloud export (Google Drive + OneDrive)
+## Cloud export (Google Drive + iCloud)
 
-Scans live in a **Google Drive** or **OneDrive** folder you choose. Settings (gear on Home, or first export) lets you:
+Scans live in a **Google Drive** or **iCloud Drive** folder you choose. Settings (gear on Home, or first export) lets you:
 
-1. **Connect Google Drive** and/or **Connect OneDrive**
+1. **Connect Google Drive** and/or **Connect iCloud**
 2. Pick or create a destination folder (remembered for later exports)
 3. See account + folder status, **Change** folder, or **Disconnect**
 
-Review’s primary button is **Save to Drive** / **Save to OneDrive** (or a chooser if both are connected). Share sheet is secondary.
+Review’s primary button is **Save to Drive** / **Save to iCloud** (or a chooser if both are connected). Share sheet is secondary.
 
-Until you add real OAuth client IDs, **Connect** still works: files are written to the app sandbox under `Documents/CloudUploadSimulation/<provider>/<folder>/` so Simulator and first-run UI can be tested.
+Until you add a real Google OAuth client ID, **Connect Drive** still works: files are written to the app sandbox under `Documents/CloudUploadSimulation/`. iCloud uses the real iCloud account on a device; Simulator falls back to the sandbox if iCloud is signed out.
+
+Privacy policy (App Store + Google consent): https://scany.pages.dev/privacy
 
 ### 1. Fill in `Scany/Cloud/CloudConfig.swift`
 
 ```
-Google.clientID     = iOS OAuth client ID ending in .apps.googleusercontent.com
-OneDrive.clientID   = Azure AD Application (client) ID
-OneDrive.tenantID   = common   (or your tenant GUID)
-OneDrive.redirectURI = msauth.com.pranaycv.Scany://auth
+Google.clientID = iOS OAuth client ID ending in .apps.googleusercontent.com
 ```
 
-`isConfigured` is false while the values still start with `YOUR_`.
+`isConfigured` is false while the value still starts with `YOUR_`. iCloud needs no client ID.
 
 ### 2. Google Cloud Console
 
@@ -134,40 +133,29 @@ OneDrive.redirectURI = msauth.com.pranaycv.Scany://auth
 2. **Credentials** → **Create credentials** → **OAuth client ID** → application type **iOS**.
 3. Bundle ID: `com.pranaycv.Scany` (or your signed ID).
 4. Copy the client ID into `CloudConfig.Google.clientID`.
-5. Add the **reversed client ID** as a URL scheme in `Info.plist` (replace `com.googleusercontent.apps.YOUR_GOOGLE_IOS_CLIENT_ID`) and set `GIDClientID` to the same client ID.
-6. OAuth consent screen: add scope `https://www.googleapis.com/auth/drive.file` (files this app creates). `userinfo.email` is used for the Settings label.
+5. Add the **reversed client ID** as a URL scheme in `Info.plist` and set `GIDClientID` to the same client ID.
+6. OAuth consent screen: add scope `https://www.googleapis.com/auth/drive.file` (files this app creates). `userinfo.email` is used for the Settings label. The app may stay in Testing; users will see Google’s unverified-app warning.
 
 Redirect used by the PKCE fallback: `{reversed-client-id}:/oauth2redirect/google`.
 
-### 3. Azure AD app registration (OneDrive / Graph)
+### 3. iCloud Drive
 
-1. [Azure Portal](https://portal.azure.com) → **Microsoft Entra ID** → **App registrations** → **New registration**.
-2. Name: Scany. Supported accounts: personal Microsoft + work/school (`common`) unless you lock a tenant.
-3. **Authentication** → **Add a platform** → **iOS / macOS**.
-4. Bundle ID: `com.pranaycv.Scany`.
-5. Redirect URI must be exactly: `msauth.com.pranaycv.Scany://auth`  
-   If you change the bundle ID, change `CloudConfig.OneDrive.redirectURI` and the `msauth.…` URL scheme in `Info.plist`.
-6. **API permissions** (delegated): `Files.ReadWrite`, `User.Read`. Grant admin consent if the tenant requires it.
-7. Copy **Application (client) ID** into `CloudConfig.OneDrive.clientID`.
+Connect iCloud opens the Files picker. Choose an **iCloud Drive** folder (create one named Scany if you want). No iCloud entitlement is required, so a free personal Apple team can still run on device. PDFs are written into that folder.
 
-### 4. Info.plist URL schemes (already stubbed)
+### 4. Info.plist URL schemes
 
 | Scheme | Purpose |
 | --- | --- |
-| `msauth.com.pranaycv.Scany` | MSAL / Microsoft OAuth return |
 | `com.googleusercontent.apps.<YOUR_IOS_CLIENT_PREFIX>` | Google Sign-In / PKCE return |
 | `scany` | Extra custom scheme |
-
-`LSApplicationQueriesSchemes` includes `msauthv2`, `msauthv3` (MSAL).
 
 ### 5. Swift packages (Xcode resolves these on open)
 
 | Package | URL | Product | License |
 | --- | --- | --- | --- |
 | Google Sign-In | https://github.com/google/GoogleSignIn-iOS | `GoogleSignIn` | Apache 2.0 |
-| MSAL | https://github.com/AzureAD/microsoft-authentication-library-for-objc | `MSAL` | MIT |
 
-Auth uses the official SDK when the package is linked (`#if canImport`). If a package is missing, the same services fall back to **PKCE + `ASWebAuthenticationSession`** against the official token endpoints. Drive API v3 and Microsoft Graph uploads always go through `URLSession`. Tokens and the remembered folder are stored in the **Keychain**. Google Sign-In / MSAL also persist their own tokens and refresh them (`refreshTokensIfNeeded` / `acquireTokenSilent`).
+Google auth uses the official SDK when the package is linked (`#if canImport`). If it is missing, Drive falls back to **PKCE + `ASWebAuthenticationSession`**. Drive API v3 uploads go through `URLSession`. Google tokens and the remembered folder are stored in the **Keychain**. iCloud uses a security-scoped Files bookmark and `NSFileCoordinator`.
 
 ## Notes
 

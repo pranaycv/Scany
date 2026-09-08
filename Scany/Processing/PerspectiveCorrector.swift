@@ -4,8 +4,17 @@ import Foundation
 import Vision
 
 enum PerspectiveCorrector {
-    /// Warps the detected page onto a rectangle. Output is upright relative to
-    /// Vision's top/bottom labels — further text-based rotation is applied later.
+    /// Maps the crop quad onto a rectangular document coordinate system.
+    /// Uses a 4-point perspective warp (homography). A 3-point affine cannot
+    /// flatten camera perspective; this is the transform that matches the page.
+    static func mapToDocumentCoordinates(image: CIImage, quad: DocumentQuad) -> CIImage? {
+        // Use the stored corner labels. Re-sorting by Y would change "up" after
+        // a recrop and look like the page rotated on its own.
+        correct(image: image, quad: quad)
+    }
+
+    /// Warps the detected page onto a rectangle. Corners should already be
+    /// ordered so top-left/top-right match the top of the phone's camera image.
     static func correct(image: CIImage, quad: DocumentQuad) -> CIImage? {
         let extent = image.extent
         guard extent.width > 2, extent.height > 2 else { return nil }
@@ -21,6 +30,7 @@ enum PerspectiveCorrector {
         filter.topRight = topRight
         filter.bottomLeft = bottomLeft
         filter.bottomRight = bottomRight
+        filter.crop = true
 
         guard var output = filter.outputImage else { return nil }
 
@@ -28,7 +38,6 @@ enum PerspectiveCorrector {
         let cropped = output.cropped(to: output.extent.integral)
         if cropped.extent.isEmpty { return nil }
 
-        // Normalize origin to (0, 0) so later transforms stay simple.
         if cropped.extent.origin != .zero {
             output = cropped.transformed(
                 by: CGAffineTransform(

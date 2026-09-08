@@ -67,12 +67,30 @@ struct OAuthTokens: Codable {
 
 enum CloudDestinationStore {
     private static let destinationsAccount = "destinations"
-    private static let lastProviderAccount = "lastProvider"
 
     struct Record: Codable {
         var google: Entry?
-        var oneDrive: Entry?
+        var iCloud: Entry?
         var lastProvider: CloudProvider?
+
+        enum CodingKeys: String, CodingKey {
+            case google, iCloud, lastProvider
+        }
+
+        init(google: Entry? = nil, iCloud: Entry? = nil, lastProvider: CloudProvider? = nil) {
+            self.google = google
+            self.iCloud = iCloud
+            self.lastProvider = lastProvider
+        }
+
+        init(from decoder: Decoder) throws {
+            let container = try decoder.container(keyedBy: CodingKeys.self)
+            google = try container.decodeIfPresent(Entry.self, forKey: .google)
+            iCloud = try container.decodeIfPresent(Entry.self, forKey: .iCloud)
+            if let raw = try container.decodeIfPresent(String.self, forKey: .lastProvider) {
+                lastProvider = CloudProvider(rawValue: raw)
+            }
+        }
     }
 
     struct Entry: Codable {
@@ -87,11 +105,5 @@ enum CloudDestinationStore {
 
     static func save(_ record: Record) {
         try? KeychainStore.setJSON(record, account: destinationsAccount)
-    }
-
-    static func setLastProvider(_ provider: CloudProvider) {
-        var record = load()
-        record.lastProvider = provider
-        save(record)
     }
 }

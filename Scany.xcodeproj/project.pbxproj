@@ -7,6 +7,9 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		A10000000000000000000025 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000024 /* Assets.xcassets */; };
+		A10000000000000000000028 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000027 /* PrivacyInfo.xcprivacy */; };
+		A10000000000000000000030 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000029 /* Preview Assets.xcassets */; };
 		A30000000000000000000001 /* ScanyApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000001 /* ScanyApp.swift */; };
 		A30000000000000000000002 /* DocumentQuad.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000002 /* DocumentQuad.swift */; };
 		A30000000000000000000003 /* ScannedPage.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000003 /* ScannedPage.swift */; };
@@ -19,35 +22,44 @@
 		A30000000000000000000010 /* OrientationCorrector.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000010 /* OrientationCorrector.swift */; };
 		A30000000000000000000011 /* ImageEnhancer.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000011 /* ImageEnhancer.swift */; };
 		A30000000000000000000012 /* ScanImageFactory.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000012 /* ScanImageFactory.swift */; };
-		A30000000000000000000019 /* PageCaptureProcessor.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000019 /* PageCaptureProcessor.swift */; };
 		A30000000000000000000013 /* PDFExporter.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000013 /* PDFExporter.swift */; };
 		A30000000000000000000014 /* Theme.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000014 /* Theme.swift */; };
-		A30000000000000000000020 /* Compatibility.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000020 /* Compatibility.swift */; };
 		A30000000000000000000015 /* HomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000015 /* HomeView.swift */; };
 		A30000000000000000000016 /* ScanViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000016 /* ScanViewModel.swift */; };
 		A30000000000000000000017 /* ScanSessionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000017 /* ScanSessionView.swift */; };
 		A30000000000000000000018 /* ReviewView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000018 /* ReviewView.swift */; };
+		A30000000000000000000019 /* PageCaptureProcessor.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000019 /* PageCaptureProcessor.swift */; };
+		A30000000000000000000041 /* PageDeskewer.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000041 /* PageDeskewer.swift */; };
+		A30000000000000000000020 /* Compatibility.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000020 /* Compatibility.swift */; };
 		A30000000000000000000021 /* CloudConfig.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000021 /* CloudConfig.swift */; };
 		A30000000000000000000022 /* CloudModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000022 /* CloudModels.swift */; };
 		A30000000000000000000023 /* KeychainStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000023 /* KeychainStore.swift */; };
 		A30000000000000000000024 /* OAuthSession.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000024 /* OAuthSession.swift */; };
 		A30000000000000000000025 /* CloudHTTP.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000025 /* CloudHTTP.swift */; };
 		A30000000000000000000026 /* GoogleDriveService.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000026 /* GoogleDriveService.swift */; };
-		A30000000000000000000027 /* OneDriveService.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000027 /* OneDriveService.swift */; };
+		A30000000000000000000027 /* ICloudDriveService.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000027 /* ICloudDriveService.swift */; };
 		A30000000000000000000028 /* SimulatedCloudStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000028 /* SimulatedCloudStore.swift */; };
 		A30000000000000000000029 /* CloudManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000029 /* CloudManager.swift */; };
 		A30000000000000000000030 /* PresentingViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000030 /* PresentingViewController.swift */; };
 		A30000000000000000000031 /* CloudSettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000031 /* CloudSettingsView.swift */; };
 		A30000000000000000000032 /* CloudFolderPickerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000032 /* CloudFolderPickerView.swift */; };
+		A30000000000000000000033 /* PDFPreviewView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000033 /* PDFPreviewView.swift */; };
+		A30000000000000000000042 /* ReviewPagePreviewView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000042 /* ReviewPagePreviewView.swift */; };
+		A30000000000000000000034 /* DeviceAttitudeTracker.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000034 /* DeviceAttitudeTracker.swift */; };
+		A30000000000000000000036 /* CapturePreviewView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000036 /* CapturePreviewView.swift */; };
+		A30000000000000000000037 /* CropEditorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000037 /* CropEditorView.swift */; };
+		A30000000000000000000038 /* ZoomableImageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000038 /* ZoomableImageView.swift */; };
+		A30000000000000000000040 /* QuadRefiner.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000040 /* QuadRefiner.swift */; };
+		A30000000000000000000043 /* QuadCorrector.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000043 /* QuadCorrector.swift */; };
 		A40000000000000000000005 /* GoogleSignIn in Frameworks */ = {isa = PBXBuildFile; productRef = A40000000000000000000003 /* GoogleSignIn */; };
-		A40000000000000000000006 /* MSAL in Frameworks */ = {isa = PBXBuildFile; productRef = A40000000000000000000004 /* MSAL */; };
-		A10000000000000000000025 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000024 /* Assets.xcassets */; };
-		A10000000000000000000028 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000027 /* PrivacyInfo.xcprivacy */; };
-		A10000000000000000000030 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000029 /* Preview Assets.xcassets */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
 		A10000000000000000000003 /* Scany.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Scany.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		A10000000000000000000024 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		A10000000000000000000026 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		A10000000000000000000027 /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
+		A10000000000000000000029 /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
 		A20000000000000000000001 /* ScanyApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScanyApp.swift; sourceTree = "<group>"; };
 		A20000000000000000000002 /* DocumentQuad.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DocumentQuad.swift; sourceTree = "<group>"; };
 		A20000000000000000000003 /* ScannedPage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScannedPage.swift; sourceTree = "<group>"; };
@@ -60,30 +72,35 @@
 		A20000000000000000000010 /* OrientationCorrector.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OrientationCorrector.swift; sourceTree = "<group>"; };
 		A20000000000000000000011 /* ImageEnhancer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageEnhancer.swift; sourceTree = "<group>"; };
 		A20000000000000000000012 /* ScanImageFactory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScanImageFactory.swift; sourceTree = "<group>"; };
-		A20000000000000000000019 /* PageCaptureProcessor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PageCaptureProcessor.swift; sourceTree = "<group>"; };
 		A20000000000000000000013 /* PDFExporter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PDFExporter.swift; sourceTree = "<group>"; };
 		A20000000000000000000014 /* Theme.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Theme.swift; sourceTree = "<group>"; };
-		A20000000000000000000020 /* Compatibility.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Compatibility.swift; sourceTree = "<group>"; };
 		A20000000000000000000015 /* HomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeView.swift; sourceTree = "<group>"; };
 		A20000000000000000000016 /* ScanViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScanViewModel.swift; sourceTree = "<group>"; };
 		A20000000000000000000017 /* ScanSessionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScanSessionView.swift; sourceTree = "<group>"; };
 		A20000000000000000000018 /* ReviewView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReviewView.swift; sourceTree = "<group>"; };
+		A20000000000000000000019 /* PageCaptureProcessor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PageCaptureProcessor.swift; sourceTree = "<group>"; };
+		A20000000000000000000041 /* PageDeskewer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PageDeskewer.swift; sourceTree = "<group>"; };
+		A20000000000000000000020 /* Compatibility.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Compatibility.swift; sourceTree = "<group>"; };
 		A20000000000000000000021 /* CloudConfig.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CloudConfig.swift; sourceTree = "<group>"; };
 		A20000000000000000000022 /* CloudModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CloudModels.swift; sourceTree = "<group>"; };
 		A20000000000000000000023 /* KeychainStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeychainStore.swift; sourceTree = "<group>"; };
 		A20000000000000000000024 /* OAuthSession.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OAuthSession.swift; sourceTree = "<group>"; };
 		A20000000000000000000025 /* CloudHTTP.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CloudHTTP.swift; sourceTree = "<group>"; };
 		A20000000000000000000026 /* GoogleDriveService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GoogleDriveService.swift; sourceTree = "<group>"; };
-		A20000000000000000000027 /* OneDriveService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OneDriveService.swift; sourceTree = "<group>"; };
+		A20000000000000000000027 /* ICloudDriveService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ICloudDriveService.swift; sourceTree = "<group>"; };
 		A20000000000000000000028 /* SimulatedCloudStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SimulatedCloudStore.swift; sourceTree = "<group>"; };
 		A20000000000000000000029 /* CloudManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CloudManager.swift; sourceTree = "<group>"; };
 		A20000000000000000000030 /* PresentingViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PresentingViewController.swift; sourceTree = "<group>"; };
 		A20000000000000000000031 /* CloudSettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CloudSettingsView.swift; sourceTree = "<group>"; };
 		A20000000000000000000032 /* CloudFolderPickerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CloudFolderPickerView.swift; sourceTree = "<group>"; };
-		A10000000000000000000024 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
-		A10000000000000000000026 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		A10000000000000000000027 /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
-		A10000000000000000000029 /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
+		A20000000000000000000033 /* PDFPreviewView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PDFPreviewView.swift; sourceTree = "<group>"; };
+		A20000000000000000000042 /* ReviewPagePreviewView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReviewPagePreviewView.swift; sourceTree = "<group>"; };
+		A20000000000000000000034 /* DeviceAttitudeTracker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeviceAttitudeTracker.swift; sourceTree = "<group>"; };
+		A20000000000000000000036 /* CapturePreviewView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CapturePreviewView.swift; sourceTree = "<group>"; };
+		A20000000000000000000037 /* CropEditorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CropEditorView.swift; sourceTree = "<group>"; };
+		A20000000000000000000038 /* ZoomableImageView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ZoomableImageView.swift; sourceTree = "<group>"; };
+		A20000000000000000000040 /* QuadRefiner.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QuadRefiner.swift; sourceTree = "<group>"; };
+		A20000000000000000000043 /* QuadCorrector.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QuadCorrector.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -92,7 +109,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				A40000000000000000000005 /* GoogleSignIn in Frameworks */,
-				A40000000000000000000006 /* MSAL in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -149,6 +165,7 @@
 			children = (
 				A20000000000000000000005 /* CameraSession.swift */,
 				A20000000000000000000006 /* CameraPreviewView.swift */,
+				A20000000000000000000034 /* DeviceAttitudeTracker.swift */,
 			);
 			path = Camera;
 			sourceTree = "<group>";
@@ -158,6 +175,8 @@
 			children = (
 				A20000000000000000000007 /* DocumentDetector.swift */,
 				A20000000000000000000008 /* QuadStabilizer.swift */,
+				A20000000000000000000040 /* QuadRefiner.swift */,
+				A20000000000000000000043 /* QuadCorrector.swift */,
 			);
 			path = Detection;
 			sourceTree = "<group>";
@@ -170,6 +189,7 @@
 				A20000000000000000000011 /* ImageEnhancer.swift */,
 				A20000000000000000000012 /* ScanImageFactory.swift */,
 				A20000000000000000000019 /* PageCaptureProcessor.swift */,
+				A20000000000000000000041 /* PageDeskewer.swift */,
 			);
 			path = Processing;
 			sourceTree = "<group>";
@@ -187,6 +207,7 @@
 			children = (
 				A20000000000000000000014 /* Theme.swift */,
 				A20000000000000000000020 /* Compatibility.swift */,
+				A20000000000000000000038 /* ZoomableImageView.swift */,
 				A20000000000000000000015 /* HomeView.swift */,
 				A10000000000000000000013 /* Scan */,
 				A10000000000000000000014 /* Review */,
@@ -200,6 +221,8 @@
 			children = (
 				A20000000000000000000016 /* ScanViewModel.swift */,
 				A20000000000000000000017 /* ScanSessionView.swift */,
+				A20000000000000000000036 /* CapturePreviewView.swift */,
+				A20000000000000000000037 /* CropEditorView.swift */,
 			);
 			path = Scan;
 			sourceTree = "<group>";
@@ -208,8 +231,18 @@
 			isa = PBXGroup;
 			children = (
 				A20000000000000000000018 /* ReviewView.swift */,
+				A20000000000000000000042 /* ReviewPagePreviewView.swift */,
+				A20000000000000000000033 /* PDFPreviewView.swift */,
 			);
 			path = Review;
+			sourceTree = "<group>";
+		};
+		A10000000000000000000031 /* Preview Content */ = {
+			isa = PBXGroup;
+			children = (
+				A10000000000000000000029 /* Preview Assets.xcassets */,
+			);
+			path = "Preview Content";
 			sourceTree = "<group>";
 		};
 		A10000000000000000000032 /* Cloud */ = {
@@ -221,7 +254,7 @@
 				A20000000000000000000024 /* OAuthSession.swift */,
 				A20000000000000000000025 /* CloudHTTP.swift */,
 				A20000000000000000000026 /* GoogleDriveService.swift */,
-				A20000000000000000000027 /* OneDriveService.swift */,
+				A20000000000000000000027 /* ICloudDriveService.swift */,
 				A20000000000000000000028 /* SimulatedCloudStore.swift */,
 				A20000000000000000000029 /* CloudManager.swift */,
 				A20000000000000000000030 /* PresentingViewController.swift */,
@@ -236,14 +269,6 @@
 				A20000000000000000000032 /* CloudFolderPickerView.swift */,
 			);
 			path = Settings;
-			sourceTree = "<group>";
-		};
-		A10000000000000000000031 /* Preview Content */ = {
-			isa = PBXGroup;
-			children = (
-				A10000000000000000000029 /* Preview Assets.xcassets */,
-			);
-			path = "Preview Content";
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -264,7 +289,6 @@
 			name = Scany;
 			packageProductDependencies = (
 				A40000000000000000000003 /* GoogleSignIn */,
-				A40000000000000000000004 /* MSAL */,
 			);
 			productName = Scany;
 			productReference = A10000000000000000000003 /* Scany.app */;
@@ -296,7 +320,6 @@
 			mainGroup = A10000000000000000000004;
 			packageReferences = (
 				A40000000000000000000001 /* XCRemoteSwiftPackageReference "GoogleSignIn-iOS" */,
-				A40000000000000000000002 /* XCRemoteSwiftPackageReference "microsoft-authentication-library-for-objc" */,
 			);
 			productRefGroup = A10000000000000000000005 /* Products */;
 			projectDirPath = "";
@@ -331,27 +354,36 @@
 				A30000000000000000000004 /* ScanDocument.swift in Sources */,
 				A30000000000000000000005 /* CameraSession.swift in Sources */,
 				A30000000000000000000006 /* CameraPreviewView.swift in Sources */,
+				A30000000000000000000034 /* DeviceAttitudeTracker.swift in Sources */,
 				A30000000000000000000007 /* DocumentDetector.swift in Sources */,
 				A30000000000000000000008 /* QuadStabilizer.swift in Sources */,
+				A30000000000000000000040 /* QuadRefiner.swift in Sources */,
+				A30000000000000000000043 /* QuadCorrector.swift in Sources */,
 				A30000000000000000000009 /* PerspectiveCorrector.swift in Sources */,
 				A30000000000000000000010 /* OrientationCorrector.swift in Sources */,
 				A30000000000000000000011 /* ImageEnhancer.swift in Sources */,
 				A30000000000000000000012 /* ScanImageFactory.swift in Sources */,
 				A30000000000000000000019 /* PageCaptureProcessor.swift in Sources */,
+				A30000000000000000000041 /* PageDeskewer.swift in Sources */,
 				A30000000000000000000013 /* PDFExporter.swift in Sources */,
 				A30000000000000000000014 /* Theme.swift in Sources */,
 				A30000000000000000000020 /* Compatibility.swift in Sources */,
 				A30000000000000000000015 /* HomeView.swift in Sources */,
 				A30000000000000000000016 /* ScanViewModel.swift in Sources */,
 				A30000000000000000000017 /* ScanSessionView.swift in Sources */,
+				A30000000000000000000036 /* CapturePreviewView.swift in Sources */,
+				A30000000000000000000037 /* CropEditorView.swift in Sources */,
+				A30000000000000000000038 /* ZoomableImageView.swift in Sources */,
 				A30000000000000000000018 /* ReviewView.swift in Sources */,
+				A30000000000000000000042 /* ReviewPagePreviewView.swift in Sources */,
+				A30000000000000000000033 /* PDFPreviewView.swift in Sources */,
 				A30000000000000000000021 /* CloudConfig.swift in Sources */,
 				A30000000000000000000022 /* CloudModels.swift in Sources */,
 				A30000000000000000000023 /* KeychainStore.swift in Sources */,
 				A30000000000000000000024 /* OAuthSession.swift in Sources */,
 				A30000000000000000000025 /* CloudHTTP.swift in Sources */,
 				A30000000000000000000026 /* GoogleDriveService.swift in Sources */,
-				A30000000000000000000027 /* OneDriveService.swift in Sources */,
+				A30000000000000000000027 /* ICloudDriveService.swift in Sources */,
 				A30000000000000000000028 /* SimulatedCloudStore.swift in Sources */,
 				A30000000000000000000029 /* CloudManager.swift in Sources */,
 				A30000000000000000000030 /* PresentingViewController.swift in Sources */,
@@ -493,15 +525,19 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "\"Scany/Preview Content\"";
+				DEVELOPMENT_TEAM = 9M5QTLKHWQ;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = Scany/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = Scany;
+				INFOPLIST_KEY_ITSAppUsesNonExemptEncryption = NO;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.productivity";
+				INFOPLIST_KEY_LSSupportsOpeningDocumentsInPlace = YES;
 				INFOPLIST_KEY_NSCameraUsageDescription = "Scany uses the camera to detect, straighten, and capture document pages.";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
-				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UIRequiredDeviceCapabilities = "arm64 still-camera auto-focus-camera";
+				INFOPLIST_KEY_UIRequiresFullScreen = YES;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
 				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
@@ -510,7 +546,7 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.pranaycv.Scany;
+				PRODUCT_BUNDLE_IDENTIFIER = com.prnysoni.Scany;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
 				SUPPORTS_MACCATALYST = NO;
@@ -532,15 +568,19 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "\"Scany/Preview Content\"";
+				DEVELOPMENT_TEAM = 9M5QTLKHWQ;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = Scany/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = Scany;
+				INFOPLIST_KEY_ITSAppUsesNonExemptEncryption = NO;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.productivity";
+				INFOPLIST_KEY_LSSupportsOpeningDocumentsInPlace = YES;
 				INFOPLIST_KEY_NSCameraUsageDescription = "Scany uses the camera to detect, straighten, and capture document pages.";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
-				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UIRequiredDeviceCapabilities = "arm64 still-camera auto-focus-camera";
+				INFOPLIST_KEY_UIRequiresFullScreen = YES;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
 				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
@@ -549,7 +589,7 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.pranaycv.Scany;
+				PRODUCT_BUNDLE_IDENTIFIER = com.prnysoni.Scany;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
 				SUPPORTS_MACCATALYST = NO;
@@ -594,14 +634,6 @@
 				minimumVersion = 8.0.0;
 			};
 		};
-		A40000000000000000000002 /* XCRemoteSwiftPackageReference "microsoft-authentication-library-for-objc" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/AzureAD/microsoft-authentication-library-for-objc";
-			requirement = {
-				kind = upToNextMajorVersion;
-				minimumVersion = 1.5.0;
-			};
-		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
@@ -609,11 +641,6 @@
 			isa = XCSwiftPackageProductDependency;
 			package = A40000000000000000000001 /* XCRemoteSwiftPackageReference "GoogleSignIn-iOS" */;
 			productName = GoogleSignIn;
-		};
-		A40000000000000000000004 /* MSAL */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = A40000000000000000000002 /* XCRemoteSwiftPackageReference "microsoft-authentication-library-for-objc" */;
-			productName = MSAL;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};
