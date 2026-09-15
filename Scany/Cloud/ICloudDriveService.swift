@@ -66,22 +66,27 @@ final class ICloudDriveService: CloudFileStore {
     }
 
     func uploadPDF(data: Data, filename: String, folder: CloudFolder) async throws -> CloudUploadResult {
+        try await uploadFiles(
+            [CloudBinaryUpload(data: data, filename: filename, mimeType: "application/pdf")],
+            folder: folder,
+            subfolder: nil
+        )
+    }
+
+    func uploadFiles(_ files: [CloudBinaryUpload], folder: CloudFolder, subfolder: String?) async throws -> CloudUploadResult {
         let destName = try withBookmarkedURL { root -> String in
-            let directory: URL
-            if folder.id == Self.rootFolderID {
-                directory = root
-            } else {
-                let trimmed = try Self.validatedFolderName(folder.id)
-                directory = root.appendingPathComponent(trimmed, isDirectory: true)
-                try fileManager.createDirectory(at: directory, withIntermediateDirectories: true)
+            let directory = try destinationDirectory(root: root, folder: folder, subfolder: subfolder)
+            var lastName = ""
+            for file in files {
+                let dest = directory.appendingPathComponent(file.filename)
+                try writeCoordinated(file.data, to: dest)
+                lastName = dest.lastPathComponent
             }
-            let dest = directory.appendingPathComponent(filename)
-            try writeCoordinated(data, to: dest)
-            return dest.lastPathComponent
+            return lastName
         }
         return CloudUploadResult(
             provider: .iCloud,
-            folderName: folder.name,
+            folderName: subfolder ?? folder.name,
             fileName: destName,
             remoteID: destName,
             isSimulated: false
@@ -150,6 +155,21 @@ final class ICloudDriveService: CloudFileStore {
             try KeychainStore.set(refreshed, account: bookmarkAccount)
         }
         return url
+    }
+
+    private func destinationDirectory(root: URL, folder: CloudFolder, subfolder: String?) throws -> URL {
+        var directory = root
+        if folder.id != Self.rootFolderID {
+            let trimmed = try Self.validatedFolderName(folder.id)
+            directory = directory.appendingPathComponent(trimmed, isDirectory: true)
+            try fileManager.createDirectory(at: directory, withIntermediateDirectories: true)
+        }
+        if let subfolder {
+            let trimmed = try Self.validatedFolderName(subfolder)
+            directory = directory.appendingPathComponent(trimmed, isDirectory: true)
+            try fileManager.createDirectory(at: directory, withIntermediateDirectories: true)
+        }
+        return directory
     }
 
     private func withBookmarkedURL<T>(_ body: (URL) throws -> T) throws -> T {

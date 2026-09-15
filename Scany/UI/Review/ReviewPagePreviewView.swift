@@ -1,4 +1,5 @@
 import SwiftUI
+import UIKit
 
 /// Review-time page editor: processed preview with enhance, rotate, and crop.
 struct ReviewPagePreviewView: View {
@@ -45,10 +46,18 @@ struct PagePreviewContent: View {
     @ObservedObject var model: ScanViewModel
     @Binding var pageID: UUID
     @Binding var isCropping: Bool
+#if DEBUG
+    @EnvironmentObject private var cloud: CloudManager
+#endif
 
     @State private var processed: UIImage?
     @State private var original: UIImage?
     @State private var isLoading = true
+#if DEBUG
+    @State private var isSavingTrain = false
+    @State private var trainToast: String?
+    @State private var trainError: String?
+#endif
 
     private var pageIndex: Int? {
         model.document.pages.firstIndex(where: { $0.id == pageID })
@@ -86,7 +95,7 @@ struct PagePreviewContent: View {
                     .foregroundStyle(.white)
             }
 
-            if model.document.pages.count > 1, !isLoading {
+            if model.document.pages.count > 1, !isLoading, !isCropping {
                 PageStepButtons(
                     canGoPrevious: canGoPrevious,
                     canGoNext: canGoNext,
@@ -94,8 +103,39 @@ struct PagePreviewContent: View {
                     onNext: { go(delta: 1) }
                 )
             }
+
+#if DEBUG
+            if let trainToast {
+                VStack {
+                    Text(trainToast)
+                        .font(.subheadline.weight(.semibold))
+                        .foregroundStyle(ScanyTheme.ink)
+                        .padding(.horizontal, 16)
+                        .padding(.vertical, 10)
+                        .background(ScanyTheme.accent, in: Capsule())
+                        .padding(.top, 12)
+                    Spacer()
+                }
+                .allowsHitTesting(false)
+            }
+#endif
         }
         .task(id: pageID) { await loadInitial() }
+#if DEBUG
+        .task(id: trainToast) {
+            guard trainToast != nil else { return }
+            try? await Task.sleep(nanoseconds: 2_200_000_000)
+            trainToast = nil
+        }
+        .alert("Could not add to train", isPresented: Binding(
+            get: { trainError != nil },
+            set: { if !$0 { trainError = nil } }
+        )) {
+            Button("OK", role: .cancel) {}
+        } message: {
+            Text(trainError ?? "")
+        }
+#endif
         .scanyOnChange(of: isCropping) { cropping in
             if !cropping {
                 Task { await reloadProcessed() }
@@ -174,11 +214,34 @@ struct PagePreviewContent: View {
                     }
                 }
             )
-            Text("Drag the corners to match the page. Pinch to zoom.")
-                .font(.caption)
-                .foregroundStyle(.white.opacity(0.7))
-                .padding(.horizontal, 16)
-                .padding(.vertical, 12)
+            VStack(spacing: 10) {
+                Text("Drag the corners to match the page. Pinch to zoom.")
+                    .font(.caption)
+                    .foregroundStyle(.white.opacity(0.7))
+#if DEBUG
+                Button(action: addToTrain) {
+                    HStack(spacing: 8) {
+                        if isSavingTrain {
+                            ProgressView()
+                                .progressViewStyle(.circular)
+                                .tint(ScanyTheme.ink)
+                        } else {
+                            Image(systemName: "square.and.arrow.down")
+                        }
+                        Text("Add to train")
+                            .font(.headline)
+                    }
+                    .frame(maxWidth: .infinity)
+                    .padding(.vertical, 12)
+                    .background(ScanyTheme.accent, in: Capsule())
+                    .foregroundStyle(ScanyTheme.ink)
+                }
+                .disabled(isSavingTrain || page == nil)
+#endif
+            }
+            .padding(.horizontal, 16)
+            .padding(.vertical, 12)
+            .background(Color.black.opacity(0.72))
         }
     }
 
@@ -227,4 +290,25 @@ struct PagePreviewContent: View {
             isCropping = true
         }
     }
+
+#if DEBUG
+    private func addToTrain() {
+        guard let page else { return }
+        trainError = nil
+        isSavingTrain = true
+        let imageURL = page.originalURL
+        let quad = page.cropQuad
+        Task {
+            defer { isSavingTrain = false }
+            do {
+                let result = try await cloud.uploadTrainingSample(imageURL: imageURL, quad: quad)
+                UINotificationFeedbackGenerator().notificationOccurred(.success)
+                trainToast = TrainingExport.successMessage(provider: result.provider)
+            } catch {
+                UINotificationFeedbackGenerator().notificationOccurred(.error)
+                trainError = error.localizedDescription
+            }
+        }
+    }
+#endif
 }

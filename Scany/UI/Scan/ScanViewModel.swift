@@ -408,7 +408,7 @@ final class ScanViewModel: ObservableObject {
 
     // MARK: - Capture
 
-    private func considerAutoCapture() {
+    private func considerAutoCapture(detected: DocumentQuad?) {
         guard authorization == .authorized else { return }
         guard !isProcessingCapture, !isPreviewingPDF else { return }
         guard pendingCapture == nil, previewingPageID == nil, !isCommittingCapture else { return }
@@ -417,23 +417,26 @@ final class ScanViewModel: ObservableObject {
             if guidance != .capturing {
                 guidance = .captured
             }
+            quad = detected
             return
         }
 
-        if let current = quad, current.isPageRectangle {
-            stabilizer.push(quad: current)
-        } else {
-            stabilizer.push(quad: nil)
-        }
+        stabilizer.push(quad: detected)
 
         switch stabilizer.evaluate() {
         case .noPage:
             if guidance != .captured {
                 guidance = .searching
             }
+            quad = nil
+        case .detecting:
+            guidance = .searching
+            quad = nil
         case .settling:
             guidance = .holdSteady
+            quad = detected
         case .ready:
+            quad = detected
             triggerCapture()
         }
     }
@@ -604,23 +607,25 @@ final class ScanViewModel: ObservableObject {
 
     private func handleDetection(quad: DocumentQuad?) {
         pageVisibleInFrame = quad != nil
-        let accepted = quad.flatMap { $0.isPageRectangle ? $0 : nil }
+        let accepted = quad.flatMap { $0.isAcceptedPage ? $0 : nil }
+        let hold: TimeInterval = 0.18
+        let held: DocumentQuad?
         if awaitingPageChange {
-            self.quad = accepted
+            held = accepted
         } else if let accepted {
             lastGoodQuad = accepted
             lastGoodQuadDate = Date()
-            self.quad = accepted
+            held = accepted
         } else if let last = lastGoodQuad,
                   let date = lastGoodQuadDate,
-                  Date().timeIntervalSince(date) < 0.18
+                  Date().timeIntervalSince(date) < hold
         {
-            self.quad = last
+            held = last
         } else {
             lastGoodQuad = nil
-            self.quad = nil
+            held = nil
         }
-        considerAutoCapture()
+        considerAutoCapture(detected: held)
     }
 
     private func invalidatePDFCache() {

@@ -130,7 +130,8 @@ enum QuadRefiner {
             bottomRight: luma.pixelToVision(refinedPixels[2]),
             bottomLeft: luma.pixelToVision(refinedPixels[3]),
             confidence: quad.confidence,
-            boundingBox: .zero
+            boundingBox: .zero,
+            lenientGeometry: quad.lenientGeometry
         )
         .alignedToImageUp()
         .withBoundingBoxFromCorners()

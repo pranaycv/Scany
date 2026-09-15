@@ -6,9 +6,12 @@ import Foundation
 struct QuadStabilizer {
     /// Vision / segmentation confidence the current quad must meet.
     var minimumConfidence: Float = 0.6
-    /// Consecutive good detections before we fire. Two frames is enough to
-    /// ignore a single noisy hit without waiting on blur, fill, or jitter.
-    var requiredGoodFrames: Int = 15
+    /// Consecutive good detections before the yellow overlay is drawn.
+    var overlayFrames: Int = 5
+    /// Consecutive good detections before auto-capture fires.
+    /// Yellow is shown from `overlayFrames` through this value, so capture
+    /// happens after 20 frames with the yellow box on screen (5 + 20 = 25).
+    var captureFrames: Int = 25
 
     private var goodStreak = 0
     private var latestQuad: DocumentQuad?
@@ -19,7 +22,7 @@ struct QuadStabilizer {
     }
 
     mutating func push(quad: DocumentQuad?) {
-        guard let quad, quad.isPageRectangle else {
+        guard let quad, quad.isAcceptedPage else {
             goodStreak = 0
             latestQuad = nil
             return
@@ -34,13 +37,15 @@ struct QuadStabilizer {
 
     enum Readiness: Equatable {
         case noPage
+        case detecting
         case settling
         case ready
     }
 
     func evaluate() -> Readiness {
         guard latestQuad != nil else { return .noPage }
-        guard goodStreak >= requiredGoodFrames else { return .settling }
+        if goodStreak < overlayFrames { return .detecting }
+        if goodStreak < captureFrames { return .settling }
         return .ready
     }
 }

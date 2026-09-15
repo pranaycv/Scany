@@ -63,7 +63,7 @@ final class CropEditorUIView: UIView, UIScrollViewDelegate {
     override init(frame: CGRect) {
         super.init(frame: frame)
         backgroundColor = .black
-        clipsToBounds = true
+        clipsToBounds = false
 
         scrollView.delegate = self
         scrollView.minimumZoomScale = 1
@@ -204,8 +204,8 @@ final class CropEditorUIView: UIView, UIScrollViewDelegate {
             let location = gesture.location(in: self)
             let rect = displayedImageRect()
             var vision = visionPoint(for: location, in: rect)
-            vision.x = min(max(vision.x, 0.01), 0.99)
-            vision.y = min(max(vision.y, 0.01), 0.99)
+            vision.x = min(max(vision.x, 0), 1)
+            vision.y = min(max(vision.y, 0), 1)
             var next = quad
             switch handle.tag {
             case 0: next.topLeft = vision
@@ -313,23 +313,32 @@ final class CropEditorUIView: UIView, UIScrollViewDelegate {
     }
 
     private func magnifiedPatch(around vision: CGPoint) -> UIImage? {
-        guard let image, let cgImage = image.cgImage else { return nil }
-        let width = CGFloat(cgImage.width)
-        let height = CGFloat(cgImage.height)
-        let sample = min(max(loupeSample * image.scale, 80), min(width, height) * 0.35)
+        guard let image else { return nil }
+        let width = image.size.width
+        let height = image.size.height
+        guard width > 1, height > 1 else { return nil }
+        let sample = min(max(loupeSample, 80), min(width, height) * 0.35)
         let px = vision.x * width
         let py = (1 - vision.y) * height
-        var crop = CGRect(
-            x: px - sample / 2,
-            y: py - sample / 2,
-            width: sample,
-            height: sample
+        let format = UIGraphicsImageRendererFormat()
+        format.opaque = true
+        format.scale = image.scale
+        let renderer = UIGraphicsImageRenderer(
+            size: CGSize(width: sample, height: sample),
+            format: format
         )
-        crop.origin.x = min(max(crop.origin.x, 0), max(width - crop.width, 0))
-        crop.origin.y = min(max(crop.origin.y, 0), max(height - crop.height, 0))
-        crop = crop.integral.intersection(CGRect(x: 0, y: 0, width: width, height: height))
-        guard !crop.isEmpty, let cropped = cgImage.cropping(to: crop) else { return nil }
-        return UIImage(cgImage: cropped, scale: image.scale, orientation: .up)
+        return renderer.image { _ in
+            UIColor.black.setFill()
+            UIRectFill(CGRect(x: 0, y: 0, width: sample, height: sample))
+            image.draw(
+                in: CGRect(
+                    x: sample / 2 - px,
+                    y: sample / 2 - py,
+                    width: width,
+                    height: height
+                )
+            )
+        }
     }
 
     private func viewPoint(for vision: CGPoint, in imageRect: CGRect) -> CGPoint {

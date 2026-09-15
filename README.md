@@ -17,7 +17,7 @@ This is a custom **AVFoundation + Vision + Core Image** pipeline — not a wrapp
 1. Clone this repo and open **`Scany.xcodeproj`** in Xcode.  
    (Optional) If you use [XcodeGen](https://github.com/yonaskolb/XcodeGen), `project.yml` can regenerate the project with `xcodegen generate`.
 2. Select the **Scany** scheme and your connected iPhone.
-3. In the project editor → **Signing & Capabilities**, choose your **Team**. The bundle ID is `com.pranaycv.Scany` — change it if Xcode cannot register that identifier on your team.
+3. In the project editor → **Signing & Capabilities**, choose your **Team**. The bundle ID is `com.prnysoni.Scany`.
 4. Plug in the iPhone, unlock it, and trust the computer if asked.
 5. Press **Run** (⌘R). On first launch, iOS will ask for **Camera** access — allow it.
 6. If iOS blocks the developer app: Settings → Privacy & Security → Developer Mode (if prompted), then Settings → General → VPN & Device Management → trust your certificate.
@@ -29,13 +29,14 @@ Test scanning on a real iPhone 12 or newer. The Simulator will show the home scr
 | Permission | Why |
 | --- | --- |
 | **Camera** (`NSCameraUsageDescription`) | Live preview, Vision page detection, auto-capture |
+| **Motion** (`NSMotionUsageDescription`) | Keep captured pages upright from how you hold the phone |
 | Photo Library | **Not required.** Cloud upload is the primary export. Share sheet is a fallback. |
 
 ## How to use
 
 1. Tap **Start scan**.
 2. Place a page in the frame. A live overlay appears on the detected quad.
-3. Hold still for about **0.7s**. When the page is large enough and not too blurry, Scany captures automatically (shutter sound + haptic), then looks for the next page.
+3. Hold still. A yellow overlay appears once the page is stable, then Scany captures automatically (shutter sound + haptic) and looks for the next page.
 4. The shutter button is optional — use it only if auto-capture does not fire.
 5. Thumbnails along the bottom show the session. Long-press a thumbnail to delete.
 6. Tap **Done** when finished. On the review screen you can delete / reorder pages, turn on **Auto-enhance all pages**, then **Save to Drive** / **Save to iCloud**. After a successful upload, clear the local page images. System share sheet remains a secondary fallback. There is **no on-device document library**.
@@ -73,7 +74,7 @@ HomeView → ScanSessionView → ReviewView → Drive / iCloud (share sheet fall
 | --- | --- |
 | `Camera/CameraSession.swift` | Back camera, 4K when available, video frames for Vision, stills for capture |
 | `Detection/DocumentDetector.swift` | Document quad in Vision normalized coordinates (any paper rotation) |
-| `Detection/QuadStabilizer.swift` | Stable for ~0.7s, fill ≥ 16%, sharpness + luminance gates |
+| `Detection/QuadStabilizer.swift` | Yellow overlay after 5 stable frames, auto-capture after 20 more |
 | `Processing/PerspectiveCorrector.swift` | Warp the quad to a rectangle |
 | `Processing/OrientationCorrector.swift` | Pick the upright rotation from text; else prefer portrait |
 | `Processing/ImageEnhancer.swift` | Document-style enhance applied to **all** pages when enabled once |
@@ -117,7 +118,9 @@ Review’s primary button is **Save to Drive** / **Save to iCloud** (or a choose
 
 Until you add a real Google OAuth client ID, **Connect Drive** still works: files are written to the app sandbox under `Documents/CloudUploadSimulation/`. iCloud uses the real iCloud account on a device; Simulator falls back to the sandbox if iCloud is signed out.
 
-Privacy policy (App Store + Google consent): https://scany.pages.dev/privacy
+Privacy policy (App Store + Google consent): https://scany.eyesrhythm.com/privacy
+
+App Store listing copy, privacy answers, and archive steps: `AppStore/LISTING.md`
 
 ### 1. Fill in `Scany/Cloud/CloudConfig.swift`
 
@@ -131,7 +134,7 @@ Google.clientID = iOS OAuth client ID ending in .apps.googleusercontent.com
 
 1. Create (or pick) a project → **APIs & Services** → enable **Google Drive API**.
 2. **Credentials** → **Create credentials** → **OAuth client ID** → application type **iOS**.
-3. Bundle ID: `com.pranaycv.Scany` (or your signed ID).
+3. Bundle ID: `com.prnysoni.Scany`.
 4. Copy the client ID into `CloudConfig.Google.clientID`.
 5. Add the **reversed client ID** as a URL scheme in `Info.plist` and set `GIDClientID` to the same client ID.
 6. OAuth consent screen: add scope `https://www.googleapis.com/auth/drive.file` (files this app creates). `userinfo.email` is used for the Settings label. The app may stay in Testing; users will see Google’s unverified-app warning.

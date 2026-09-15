@@ -53,7 +53,7 @@ enum PageCaptureProcessor {
         let correctedLive = liveFallback.map { QuadCorrector.correctingOutlierCorner($0) }
         let candidate = [correctedStill, correctedLive]
             .compactMap { $0 }
-            .first { $0.isPageRectangle }
+            .first { $0.isAcceptedPage }
         let quad = candidate?.alignedToImageUp() ?? DocumentQuad.fallbackFullFrame()
 
         let display = ScanImageFactory.uiImage(

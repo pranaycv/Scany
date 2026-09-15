@@ -10,6 +10,8 @@ struct DocumentQuad: Equatable, Sendable {
     var bottomLeft: CGPoint
     var confidence: Float
     var boundingBox: CGRect
+    /// When true, overlay and auto-capture use a looser page gate (FastViT heatmaps).
+    var lenientGeometry: Bool = false
 
     var corners: [CGPoint] {
         [topLeft, topRight, bottomRight, bottomLeft]
@@ -45,10 +47,16 @@ struct DocumentQuad: Equatable, Sendable {
         jitter(to: other) < 0.16 && abs(fillRatio - other.fillRatio) < 0.14
     }
 
+    /// Vision path: four corners must look like a page rectangle.
+    var isPageRectangle: Bool { passesPageGeometry(Self.strictPageLimits) }
+
+    /// Overlay / auto-capture gate. Same strict rectangle as Vision.
+    var isAcceptedPage: Bool { isPageRectangle }
+
     /// True when the four corners form a page rectangle: opposite edges stay
     /// parallel on the page, with enough slack for camera perspective. One
     /// runaway corner fails until QuadCorrector rebuilds it from the other three.
-    var isPageRectangle: Bool {
+    private func passesPageGeometry(_ limits: PageLimits) -> Bool {
         guard isConvex else { return false }
 
         let pts = corners
@@ -60,14 +68,14 @@ struct DocumentQuad: Equatable, Sendable {
             lengths.append(hypot(b.x - a.x, b.y - a.y))
         }
         guard let minEdge = lengths.min(), let maxEdge = lengths.max(),
-              minEdge > 0.045, maxEdge / minEdge < 4.8
+              minEdge > limits.minEdge, maxEdge / minEdge < limits.maxEdgeRatio
         else { return false }
 
         func sideRatio(_ a: CGFloat, _ b: CGFloat) -> CGFloat {
             max(a, b) / max(min(a, b), 0.0001)
         }
-        guard sideRatio(lengths[0], lengths[2]) < 1.65,
-              sideRatio(lengths[1], lengths[3]) < 1.65
+        guard sideRatio(lengths[0], lengths[2]) < limits.oppositeSideRatio,
+              sideRatio(lengths[1], lengths[3]) < limits.oppositeSideRatio
         else { return false }
 
         var dirs: [CGPoint] = []
@@ -80,15 +88,16 @@ struct DocumentQuad: Equatable, Sendable {
         }
         let oppositeAlign0 = abs(dirs[0].x * dirs[2].x + dirs[0].y * dirs[2].y)
         let oppositeAlign1 = abs(dirs[1].x * dirs[3].x + dirs[1].y * dirs[3].y)
-        guard oppositeAlign0 > 0.45, oppositeAlign1 > 0.45 else { return false }
+        guard oppositeAlign0 > limits.oppositeAlign, oppositeAlign1 > limits.oppositeAlign else {
+            return false
+        }
 
-        let maxSkew = 36 * CGFloat.pi / 180
         for index in 0..<4 {
             let previous = pts[(index + 3) % 4]
             let point = pts[index]
             let next = pts[(index + 1) % 4]
             let angle = abs(interiorAngle(at: point, from: previous, to: next))
-            if abs(angle - .pi / 2) > maxSkew {
+            if abs(angle - .pi / 2) > limits.maxSkew {
                 return false
             }
         }
@@ -100,8 +109,10 @@ struct DocumentQuad: Equatable, Sendable {
         let radii = pts.map { hypot($0.x - center.x, $0.y - center.y) }
         let sortedRadii = radii.sorted()
         let medianRadius = (sortedRadii[1] + sortedRadii[2]) / 2
-        guard medianRadius > 0.04 else { return false }
-        if radii.contains(where: { $0 > medianRadius * 1.50 || $0 < medianRadius * 0.58 }) {
+        guard medianRadius > limits.minMedianRadius else { return false }
+        if radii.contains(where: {
+            $0 > medianRadius * limits.radiusHigh || $0 < medianRadius * limits.radiusLow
+        }) {
             return false
         }
 
@@ -118,12 +129,36 @@ struct DocumentQuad: Equatable, Sendable {
             let point = pts[index]
             let dx = max(minX - point.x, 0, point.x - maxX)
             let dy = max(minY - point.y, 0, point.y - maxY)
-            if hypot(dx, dy) > quadScale * 0.14 {
+            if hypot(dx, dy) > quadScale * limits.outlierFraction {
                 return false
             }
         }
         return true
     }
+
+    private struct PageLimits {
+        var minEdge: CGFloat
+        var maxEdgeRatio: CGFloat
+        var oppositeSideRatio: CGFloat
+        var oppositeAlign: CGFloat
+        var maxSkew: CGFloat
+        var minMedianRadius: CGFloat
+        var radiusHigh: CGFloat
+        var radiusLow: CGFloat
+        var outlierFraction: CGFloat
+    }
+
+    private static let strictPageLimits = PageLimits(
+        minEdge: 0.045,
+        maxEdgeRatio: 4.8,
+        oppositeSideRatio: 1.65,
+        oppositeAlign: 0.45,
+        maxSkew: 36 * .pi / 180,
+        minMedianRadius: 0.04,
+        radiusHigh: 1.50,
+        radiusLow: 0.58,
+        outlierFraction: 0.14
+    )
 
     var isConvex: Bool {
         let pts = corners
@@ -162,7 +197,8 @@ struct DocumentQuad: Equatable, Sendable {
             bottomRight: bottom[1],
             bottomLeft: bottom[0],
             confidence: confidence,
-            boundingBox: boundingBox
+            boundingBox: boundingBox,
+            lenientGeometry: lenientGeometry
         )
     }
 
@@ -177,6 +213,28 @@ struct DocumentQuad: Equatable, Sendable {
             confidence: 0.2,
             boundingBox: CGRect(x: minV, y: minV, width: maxV - minV, height: maxV - minV)
         )
+    }
+
+    /// Training / DocCorner space: normalized 0...1, origin at the image
+    /// top-left. Vision uses a bottom-left origin, so y is flipped (`1 - y`).
+    func trainingQuadNorm() -> [String: [Double]] {
+        func pair(_ point: CGPoint) -> [Double] {
+            [
+                Self.trainingCoordinate(point.x),
+                Self.trainingCoordinate(1 - point.y)
+            ]
+        }
+        return [
+            "tl": pair(topLeft),
+            "tr": pair(topRight),
+            "br": pair(bottomRight),
+            "bl": pair(bottomLeft)
+        ]
+    }
+
+    private static func trainingCoordinate(_ value: CGFloat) -> Double {
+        let clamped = min(max(Double(value), 0), 1)
+        return (clamped * 1_000_000).rounded() / 1_000_000
     }
 
     func withBoundingBoxFromCorners() -> DocumentQuad {
@@ -210,7 +268,8 @@ struct DocumentQuad: Equatable, Sendable {
             boundingBox: boundingBox.insetBy(
                 dx: boundingBox.width * amount * 0.5,
                 dy: boundingBox.height * amount * 0.5
-            )
+            ),
+            lenientGeometry: lenientGeometry
         )
     }
 }

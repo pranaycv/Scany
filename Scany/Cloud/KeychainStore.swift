@@ -6,7 +6,7 @@ enum KeychainStore {
     static func set(_ data: Data, account: String) throws {
         let query: [String: Any] = [
             kSecClass as String: kSecClassGenericPassword,
-            kSecAttrService as String: "com.pranaycv.Scany.cloud",
+            kSecAttrService as String: "com.prnysoni.Scany.cloud",
             kSecAttrAccount as String: account
         ]
         SecItemDelete(query as CFDictionary)
@@ -23,7 +23,7 @@ enum KeychainStore {
     static func data(account: String) -> Data? {
         let query: [String: Any] = [
             kSecClass as String: kSecClassGenericPassword,
-            kSecAttrService as String: "com.pranaycv.Scany.cloud",
+            kSecAttrService as String: "com.prnysoni.Scany.cloud",
             kSecAttrAccount as String: account,
             kSecReturnData as String: true,
             kSecMatchLimit as String: kSecMatchLimitOne
@@ -37,7 +37,7 @@ enum KeychainStore {
     static func delete(account: String) {
         let query: [String: Any] = [
             kSecClass as String: kSecClassGenericPassword,
-            kSecAttrService as String: "com.pranaycv.Scany.cloud",
+            kSecAttrService as String: "com.prnysoni.Scany.cloud",
             kSecAttrAccount as String: account
         ]
         SecItemDelete(query as CFDictionary)

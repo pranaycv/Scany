@@ -209,7 +209,8 @@ extension DocumentQuad {
             bottomRight: pts[2],
             bottomLeft: pts[3],
             confidence: confidence,
-            boundingBox: .zero
+            boundingBox: .zero,
+            lenientGeometry: lenientGeometry
         )
         .withBoundingBoxFromCorners()
     }

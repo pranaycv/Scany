@@ -42,7 +42,7 @@ final class CameraSession: NSObject {
     override init() {
         super.init()
         previewLayer.session = session
-        previewLayer.videoGravity = .resizeAspectFill
+        previewLayer.videoGravity = .resizeAspect
     }
 
     func configureAndStart() {
@@ -141,7 +141,7 @@ final class CameraSession: NSObject {
     }
 
     /// Maps a Vision point (normalized, origin bottom-left, in the *oriented*
-    /// image) onto the preview layer, including `.resizeAspectFill` cropping.
+    /// image) onto the preview layer, including `.resizeAspect` letterboxing.
     ///
     /// Capture-device points are the unrotated sensor. Using those with a
     /// portrait video buffer makes the overlay larger than the paper. Metadata

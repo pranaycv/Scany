@@ -1,0 +1,14 @@
+# Last official Intel Mac wheels are torch 2.2.x. Transformers 5.x needs torch>=2.5.
+torch==2.2.2
+torchvision==0.17.2
+numpy==1.26.4
+transformers==4.57.3
+huggingface_hub>=0.26.0,<1.0
+accelerate>=0.34.0
+safetensors>=0.4.0
+datasets>=3.0.0
+pillow>=10.0.0
+opencv-python-headless>=4.10.0
+tqdm>=4.66.0
+pyarrow>=17.0.0
+coremltools>=7.2,<9

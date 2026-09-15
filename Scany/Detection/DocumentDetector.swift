@@ -2,13 +2,10 @@ import CoreImage
 import Foundation
 import Vision
 
-/// Detects a document page quadrilateral with Vision, then snaps corners to
-/// paper edges.
+/// Detects a document page quadrilateral, then snaps corners to paper edges.
 ///
-/// 1. `VNDetectDocumentSegmentationRequest` finds the page region (often a mask).
-/// 2. Contours on that mask produce a tight 4-vertex hull — not x±y extrema.
-/// 3. `VNDetectRectanglesRequest` is the fallback if segmentation finds nothing.
-/// 4. `QuadRefiner` walks each edge and locks it onto the strongest gradient.
+/// Coarse detection uses `VNDetectDocumentSegmentationRequest`, then rectangles.
+/// The result is refined with `QuadRefiner` edge snap and `QuadCorrector`.
 final class DocumentDetector: @unchecked Sendable {
     enum Quality {
         case live
@@ -66,7 +63,7 @@ final class DocumentDetector: @unchecked Sendable {
         source: CIImage,
         quality: Quality
     ) -> DocumentQuad? {
-        let coarse = runSegmentation(handler) ?? runRectangles(handler)
+        let coarse = coarseQuad(handler: handler, source: source)
         guard let coarse else { return nil }
 
         let maxDimension: CGFloat = quality == .live ? 400 : 720
@@ -85,8 +82,12 @@ final class DocumentDetector: @unchecked Sendable {
             refined = aligned
         }
         let corrected = QuadCorrector.correctingOutlierCorner(refined)
-        guard corrected.isPageRectangle else { return nil }
+        guard corrected.isAcceptedPage else { return nil }
         return corrected
+    }
+
+    private func coarseQuad(handler: VNImageRequestHandler, source: CIImage) -> DocumentQuad? {
+        runSegmentation(handler) ?? runRectangles(handler)
     }
 
     private func runSegmentation(_ handler: VNImageRequestHandler) -> DocumentQuad? {

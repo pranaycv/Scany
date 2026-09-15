@@ -202,7 +202,44 @@ final class CloudManager: ObservableObject {
         return result
     }
 
+    func uploadTrainingSample(imageURL: URL, quad: DocumentQuad) async throws -> CloudUploadResult {
+        let (provider, folder) = try trainingDestination()
+        do {
+            let sample = try await Task.detached(priority: .userInitiated) {
+                try TrainingExport.makeFiles(imageURL: imageURL, quad: quad)
+            }.value
+            return try await activeStore(provider).uploadFiles(
+                sample,
+                folder: folder,
+                subfolder: TrainingExport.folderName
+            )
+        } catch let error as CloudError {
+            switch error {
+            case .notSignedIn, .noFolder:
+                throw CloudError.message(TrainingExport.missingDestination)
+            default:
+                throw error
+            }
+        }
+    }
+
     // MARK: - Private
+
+    private func trainingDestination() throws -> (CloudProvider, CloudFolder) {
+        if let lastUsedProvider,
+           let connection = connection(for: lastUsedProvider),
+           let folder = connection.folder {
+            return (lastUsedProvider, folder)
+        }
+        if let connection = iCloud, let folder = connection.folder {
+            return (.iCloud, folder)
+        }
+        if let connection = google, let folder = connection.folder {
+            return (.googleDrive, folder)
+        }
+        throw CloudError.message(TrainingExport.missingDestination)
+    }
+
 
     private func restoreLiveSessions() async {
         if let account = await googleLive.restoreSession() {

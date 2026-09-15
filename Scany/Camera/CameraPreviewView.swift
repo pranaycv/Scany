@@ -71,7 +71,7 @@ final class CameraPreviewUIView: UIView {
     }
 
     func updateOverlay(quad: DocumentQuad?, color: UIColor, emphasized: Bool) {
-        guard let quad, quad.isPageRectangle, let camera else {
+        guard let quad, quad.isAcceptedPage, let camera else {
             overlay.path = nil
             fill.path = nil
             dim.path = nil

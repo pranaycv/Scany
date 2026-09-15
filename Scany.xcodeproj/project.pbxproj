@@ -29,7 +29,6 @@
 		A30000000000000000000017 /* ScanSessionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000017 /* ScanSessionView.swift */; };
 		A30000000000000000000018 /* ReviewView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000018 /* ReviewView.swift */; };
 		A30000000000000000000019 /* PageCaptureProcessor.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000019 /* PageCaptureProcessor.swift */; };
-		A30000000000000000000041 /* PageDeskewer.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000041 /* PageDeskewer.swift */; };
 		A30000000000000000000020 /* Compatibility.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000020 /* Compatibility.swift */; };
 		A30000000000000000000021 /* CloudConfig.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000021 /* CloudConfig.swift */; };
 		A30000000000000000000022 /* CloudModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000022 /* CloudModels.swift */; };
@@ -44,12 +43,13 @@
 		A30000000000000000000031 /* CloudSettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000031 /* CloudSettingsView.swift */; };
 		A30000000000000000000032 /* CloudFolderPickerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000032 /* CloudFolderPickerView.swift */; };
 		A30000000000000000000033 /* PDFPreviewView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000033 /* PDFPreviewView.swift */; };
-		A30000000000000000000042 /* ReviewPagePreviewView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000042 /* ReviewPagePreviewView.swift */; };
 		A30000000000000000000034 /* DeviceAttitudeTracker.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000034 /* DeviceAttitudeTracker.swift */; };
 		A30000000000000000000036 /* CapturePreviewView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000036 /* CapturePreviewView.swift */; };
 		A30000000000000000000037 /* CropEditorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000037 /* CropEditorView.swift */; };
 		A30000000000000000000038 /* ZoomableImageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000038 /* ZoomableImageView.swift */; };
 		A30000000000000000000040 /* QuadRefiner.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000040 /* QuadRefiner.swift */; };
+		A30000000000000000000041 /* PageDeskewer.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000041 /* PageDeskewer.swift */; };
+		A30000000000000000000042 /* ReviewPagePreviewView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000042 /* ReviewPagePreviewView.swift */; };
 		A30000000000000000000043 /* QuadCorrector.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000043 /* QuadCorrector.swift */; };
 		A40000000000000000000005 /* GoogleSignIn in Frameworks */ = {isa = PBXBuildFile; productRef = A40000000000000000000003 /* GoogleSignIn */; };
 /* End PBXBuildFile section */
@@ -79,7 +79,6 @@
 		A20000000000000000000017 /* ScanSessionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScanSessionView.swift; sourceTree = "<group>"; };
 		A20000000000000000000018 /* ReviewView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReviewView.swift; sourceTree = "<group>"; };
 		A20000000000000000000019 /* PageCaptureProcessor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PageCaptureProcessor.swift; sourceTree = "<group>"; };
-		A20000000000000000000041 /* PageDeskewer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PageDeskewer.swift; sourceTree = "<group>"; };
 		A20000000000000000000020 /* Compatibility.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Compatibility.swift; sourceTree = "<group>"; };
 		A20000000000000000000021 /* CloudConfig.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CloudConfig.swift; sourceTree = "<group>"; };
 		A20000000000000000000022 /* CloudModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CloudModels.swift; sourceTree = "<group>"; };
@@ -94,12 +93,13 @@
 		A20000000000000000000031 /* CloudSettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CloudSettingsView.swift; sourceTree = "<group>"; };
 		A20000000000000000000032 /* CloudFolderPickerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CloudFolderPickerView.swift; sourceTree = "<group>"; };
 		A20000000000000000000033 /* PDFPreviewView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PDFPreviewView.swift; sourceTree = "<group>"; };
-		A20000000000000000000042 /* ReviewPagePreviewView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReviewPagePreviewView.swift; sourceTree = "<group>"; };
 		A20000000000000000000034 /* DeviceAttitudeTracker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeviceAttitudeTracker.swift; sourceTree = "<group>"; };
 		A20000000000000000000036 /* CapturePreviewView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CapturePreviewView.swift; sourceTree = "<group>"; };
 		A20000000000000000000037 /* CropEditorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CropEditorView.swift; sourceTree = "<group>"; };
 		A20000000000000000000038 /* ZoomableImageView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ZoomableImageView.swift; sourceTree = "<group>"; };
 		A20000000000000000000040 /* QuadRefiner.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QuadRefiner.swift; sourceTree = "<group>"; };
+		A20000000000000000000041 /* PageDeskewer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PageDeskewer.swift; sourceTree = "<group>"; };
+		A20000000000000000000042 /* ReviewPagePreviewView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReviewPagePreviewView.swift; sourceTree = "<group>"; };
 		A20000000000000000000043 /* QuadCorrector.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QuadCorrector.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -534,6 +534,7 @@
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.productivity";
 				INFOPLIST_KEY_LSSupportsOpeningDocumentsInPlace = YES;
 				INFOPLIST_KEY_NSCameraUsageDescription = "Scany uses the camera to detect, straighten, and capture document pages.";
+				INFOPLIST_KEY_NSMotionUsageDescription = "Scany uses motion data during a scan to keep each captured page upright based on how you hold the phone.";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UIRequiredDeviceCapabilities = "arm64 still-camera auto-focus-camera";
@@ -577,6 +578,7 @@
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.productivity";
 				INFOPLIST_KEY_LSSupportsOpeningDocumentsInPlace = YES;
 				INFOPLIST_KEY_NSCameraUsageDescription = "Scany uses the camera to detect, straighten, and capture document pages.";
+				INFOPLIST_KEY_NSMotionUsageDescription = "Scany uses motion data during a scan to keep each captured page upright based on how you hold the phone.";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UIRequiredDeviceCapabilities = "arm64 still-camera auto-focus-camera";

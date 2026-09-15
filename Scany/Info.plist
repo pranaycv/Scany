@@ -8,7 +8,7 @@
 			<key>CFBundleTypeRole</key>
 			<string>Editor</string>
 			<key>CFBundleURLName</key>
-			<string>com.pranaycv.Scany.google</string>
+			<string>com.prnysoni.Scany.google</string>
 			<key>CFBundleURLSchemes</key>
 			<array>
 				<string>scany</string>

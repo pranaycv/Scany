@@ -31,7 +31,10 @@ targets:
         INFOPLIST_FILE: Scany/Info.plist
         GENERATE_INFOPLIST_FILE: YES
         INFOPLIST_KEY_CFBundleDisplayName: Scany
+        INFOPLIST_KEY_ITSAppUsesNonExemptEncryption: NO
+        INFOPLIST_KEY_LSApplicationCategoryType: public.app-category.productivity
         INFOPLIST_KEY_NSCameraUsageDescription: "Scany uses the camera to detect, straighten, and capture document pages."
+        INFOPLIST_KEY_NSMotionUsageDescription: "Scany uses motion data during a scan to keep each captured page upright based on how you hold the phone."
         INFOPLIST_KEY_UILaunchScreen_Generation: YES
         INFOPLIST_KEY_UISupportedInterfaceOrientations: UIInterfaceOrientationPortrait
         ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon

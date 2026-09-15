@@ -56,6 +56,85 @@ struct CloudUploadResult: Equatable {
     var isSimulated: Bool
 }
 
+struct CloudBinaryUpload {
+    var data: Data
+    var filename: String
+    var mimeType: String
+}
+
+enum TrainingExport {
+    static let folderName = "Train"
+    static let missingDestination = "Connect iCloud and pick a folder in Settings first"
+
+    static func successMessage(provider: CloudProvider) -> String {
+        "Saved to Train in \(provider.displayName)"
+    }
+
+    static func fileStem(at date: Date = Date()) -> String {
+        let formatter = DateFormatter()
+        formatter.locale = Locale(identifier: "en_US_POSIX")
+        formatter.timeZone = TimeZone.current
+        formatter.dateFormat = "yyyyMMdd_HHmmss"
+        return "train_\(formatter.string(from: date))"
+    }
+
+    static func iso8601UTC(_ date: Date = Date()) -> String {
+        let formatter = ISO8601DateFormatter()
+        formatter.formatOptions = [.withInternetDateTime]
+        formatter.timeZone = TimeZone(secondsFromGMT: 0)
+        return formatter.string(from: date)
+    }
+
+    static func jsonData(
+        filename: String,
+        imageWidth: Int,
+        imageHeight: Int,
+        quad: DocumentQuad,
+        createdAt: Date = Date()
+    ) throws -> Data {
+        let payload: [String: Any] = [
+            "filename": filename,
+            "image_width": imageWidth,
+            "image_height": imageHeight,
+            "quad_norm": quad.trainingQuadNorm(),
+            "source": "manual",
+            "created_at": iso8601UTC(createdAt),
+            "presence": true
+        ]
+        return try JSONSerialization.data(
+            withJSONObject: payload,
+            options: [.prettyPrinted, .sortedKeys]
+        )
+    }
+
+    static func makeFiles(imageURL: URL, quad: DocumentQuad, createdAt: Date = Date()) throws -> [CloudBinaryUpload] {
+        guard let photo = ScanImageFactory.ciImage(from: imageURL) else {
+            throw CloudError.message("Could not load the page image.")
+        }
+        let width = Int(photo.extent.width.rounded())
+        let height = Int(photo.extent.height.rounded())
+        guard width > 0, height > 0 else {
+            throw CloudError.message("Could not read the page image size.")
+        }
+        guard let imageData = ScanImageFactory.jpegData(from: photo, quality: 0.95) else {
+            throw CloudError.message("Could not encode the page image.")
+        }
+        let stem = fileStem(at: createdAt)
+        let imageName = "\(stem).jpg"
+        let json = try jsonData(
+            filename: imageName,
+            imageWidth: width,
+            imageHeight: height,
+            quad: quad,
+            createdAt: createdAt
+        )
+        return [
+            CloudBinaryUpload(data: imageData, filename: imageName, mimeType: "image/jpeg"),
+            CloudBinaryUpload(data: json, filename: "\(stem).json", mimeType: "application/json")
+        ]
+    }
+}
+
 enum CloudError: LocalizedError, Sendable {
     case notConfigured
     case notSignedIn
@@ -92,4 +171,5 @@ protocol CloudFileStore: AnyObject {
     func listFolders() async throws -> [CloudFolder]
     func createFolder(named name: String) async throws -> CloudFolder
     func uploadPDF(data: Data, filename: String, folder: CloudFolder) async throws -> CloudUploadResult
+    func uploadFiles(_ files: [CloudBinaryUpload], folder: CloudFolder, subfolder: String?) async throws -> CloudUploadResult
 }

@@ -58,15 +58,32 @@ final class SimulatedCloudStore: CloudFileStore {
     }
 
     func uploadPDF(data: Data, filename: String, folder: CloudFolder) async throws -> CloudUploadResult {
-        let directory = root.appendingPathComponent(folder.id, isDirectory: true)
+        try await uploadFiles(
+            [CloudBinaryUpload(data: data, filename: filename, mimeType: "application/pdf")],
+            folder: folder,
+            subfolder: nil
+        )
+    }
+
+    func uploadFiles(_ files: [CloudBinaryUpload], folder: CloudFolder, subfolder: String?) async throws -> CloudUploadResult {
+        var directory = root.appendingPathComponent(folder.id, isDirectory: true)
+        if let subfolder {
+            directory = directory.appendingPathComponent(subfolder, isDirectory: true)
+        }
         try fileManager.createDirectory(at: directory, withIntermediateDirectories: true)
-        let fileURL = directory.appendingPathComponent(filename)
-        try data.write(to: fileURL, options: .atomic)
+        var lastName = ""
+        var lastPath = directory.path
+        for file in files {
+            let fileURL = directory.appendingPathComponent(file.filename)
+            try file.data.write(to: fileURL, options: .atomic)
+            lastName = file.filename
+            lastPath = fileURL.path
+        }
         return CloudUploadResult(
             provider: provider,
-            folderName: folder.name,
-            fileName: filename,
-            remoteID: fileURL.path,
+            folderName: subfolder ?? folder.name,
+            fileName: lastName,
+            remoteID: lastPath,
             isSimulated: true
         )
     }

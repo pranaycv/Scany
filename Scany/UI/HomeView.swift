@@ -46,15 +46,17 @@ struct HomeView: View {
                         .foregroundStyle(.white)
 
                     VStack(spacing: 8) {
-                        Text("Cloud-first PDF")
-                            .font(.title3.weight(.semibold))
-                            .foregroundStyle(.white)
-                        Text("Save to Google Drive or iCloud, then clear the local pages.")
+                        Text("Save to Google Drive or iCloud.")
                             .font(.body)
                             .foregroundStyle(.white.opacity(0.72))
                             .multilineTextAlignment(.center)
-                            .padding(.horizontal, 28)
+                        Text("Privacy first. Your files stay in your space. Nothing leaves without you.")
+                            .font(.callout)
+                            .foregroundStyle(.white.opacity(0.62))
+                            .multilineTextAlignment(.center)
                     }
+                    .padding(.horizontal, 28)
+                    .padding(.top, 4)
                 }
 
                 Spacer()
@@ -72,7 +74,7 @@ struct HomeView: View {
                         .foregroundStyle(ScanyTheme.ink)
                 }
                 .padding(.horizontal, 20)
-                .padding(.top, 22)
+                .padding(.top, 12)
                 .padding(.bottom, 28)
             }
         }

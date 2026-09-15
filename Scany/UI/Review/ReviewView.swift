@@ -110,26 +110,16 @@ struct ReviewView: View {
 
     private var uploadSuccessAlert: some View {
         EmptyView()
-            .alert("Uploaded", isPresented: $showUploadSuccess) {
-                Button("Clear local copies") {
-                    model.clearLocalCopies()
+            .alert("File Saved Successfully", isPresented: $showUploadSuccess) {
+                Button("Home") {
                     uploadResult = nil
+                    model.clearLocalCopies()
                     onHome()
                 }
-                Button("Keep scanning", role: .cancel) {
+                Button("Stay Here", role: .cancel) {
                     uploadResult = nil
                 }
-            } message: {
-                Text(uploadSuccessMessage)
             }
-    }
-
-    private var uploadSuccessMessage: String {
-        guard let uploadResult else { return "The PDF is in your cloud folder." }
-        let place = uploadResult.isSimulated
-            ? "the sandbox folder \(uploadResult.folderName)"
-            : "\(uploadResult.folderName) on \(uploadResult.provider.displayName)"
-        return "\(uploadResult.fileName) is in \(place). Local page images can be cleared — Scany does not keep a document library."
     }
 
     @ViewBuilder

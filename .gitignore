@@ -27,3 +27,19 @@ build/
 
 # Cloudflare Wrangler local cache (account info)
 .wrangler/
+
+# Segmentation experiment artifacts (weights, dataset, venv, review images)
+segmentation-experiment/.wheels/
+segmentation-experiment/.venv/
+segmentation-experiment/data/
+segmentation-experiment/models/
+segmentation-experiment/review/
+segmentation-experiment/review_*/
+segmentation-experiment/runs/
+segmentation-experiment/__pycache__/
+segmentation-experiment/**/__pycache__/
+*.safetensors
+*.pt
+*.bin
+!Scany/**/*.mlpackage/**
+*.parquet

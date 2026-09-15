@@ -100,11 +100,43 @@ final class GoogleDriveService: CloudFileStore {
     }
 
     func uploadPDF(data: Data, filename: String, folder: CloudFolder) async throws -> CloudUploadResult {
+        try await uploadFile(data: data, filename: filename, mimeType: "application/pdf", folder: folder)
+    }
+
+    func uploadFiles(_ files: [CloudBinaryUpload], folder: CloudFolder, subfolder: String?) async throws -> CloudUploadResult {
+        var target = folder
+        if let subfolder, !subfolder.isEmpty {
+            target = try await findOrCreateFolder(named: subfolder, parent: folder)
+        }
+        var last = CloudUploadResult(
+            provider: .googleDrive,
+            folderName: target.name,
+            fileName: "",
+            remoteID: nil,
+            isSimulated: false
+        )
+        for file in files {
+            last = try await uploadFile(
+                data: file.data,
+                filename: file.filename,
+                mimeType: file.mimeType,
+                folder: target
+            )
+        }
+        return last
+    }
+
+    private func uploadFile(
+        data: Data,
+        filename: String,
+        mimeType: String,
+        folder: CloudFolder
+    ) async throws -> CloudUploadResult {
         let token = try await accessToken()
         let boundary = "scany-\(UUID().uuidString)"
         var metadata: [String: Any] = [
             "name": filename,
-            "mimeType": "application/pdf"
+            "mimeType": mimeType
         ]
         if folder.id != "root" {
             metadata["parents"] = [folder.id]
@@ -116,7 +148,7 @@ final class GoogleDriveService: CloudFileStore {
         body.append(Data("Content-Type: application/json; charset=UTF-8\r\n\r\n".utf8))
         body.append(metaData)
         body.append(Data("\r\n--\(boundary)\r\n".utf8))
-        body.append(Data("Content-Type: application/pdf\r\n\r\n".utf8))
+        body.append(Data("Content-Type: \(mimeType)\r\n\r\n".utf8))
         body.append(data)
         body.append(Data("\r\n--\(boundary)--\r\n".utf8))
 
@@ -138,6 +170,55 @@ final class GoogleDriveService: CloudFileStore {
             remoteID: json["id"] as? String,
             isSimulated: false
         )
+    }
+
+    private func findOrCreateFolder(named name: String, parent: CloudFolder) async throws -> CloudFolder {
+        let token = try await accessToken()
+        let parentID = parent.id.isEmpty ? "root" : parent.id
+        let escapedName = name
+            .replacingOccurrences(of: "\\", with: "\\\\")
+            .replacingOccurrences(of: "'", with: "\\'")
+        let escapedParent = parentID
+            .replacingOccurrences(of: "\\", with: "\\\\")
+            .replacingOccurrences(of: "'", with: "\\'")
+        let items: [String: String] = [
+            "q": "name = '\(escapedName)' and mimeType = 'application/vnd.google-apps.folder' and '\(escapedParent)' in parents and trashed = false",
+            "fields": "files(id,name)",
+            "pageSize": "1",
+            "spaces": "drive"
+        ]
+        var request = URLRequest(
+            url: URL(string: "https://www.googleapis.com/drive/v3/files?\(CloudHTTP.queryItems(items))")!
+        )
+        request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
+        let (data, response) = try await CloudHTTP.send(request)
+        try CloudHTTP.requireOK(data, response)
+        let json = CloudHTTP.jsonObject(from: data)
+        if let files = json["files"] as? [[String: Any]],
+           let row = files.first,
+           let id = row["id"] as? String {
+            return CloudFolder(id: id, name: row["name"] as? String ?? name)
+        }
+
+        var create = URLRequest(url: URL(string: "https://www.googleapis.com/drive/v3/files")!)
+        create.httpMethod = "POST"
+        create.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
+        create.setValue("application/json", forHTTPHeaderField: "Content-Type")
+        var metadata: [String: Any] = [
+            "name": name,
+            "mimeType": "application/vnd.google-apps.folder"
+        ]
+        if parentID != "root" {
+            metadata["parents"] = [parentID]
+        }
+        create.httpBody = try JSONSerialization.data(withJSONObject: metadata)
+        let (createdData, createdResponse) = try await CloudHTTP.send(create)
+        try CloudHTTP.requireOK(createdData, createdResponse)
+        let created = CloudHTTP.jsonObject(from: createdData)
+        guard let id = created["id"] as? String else {
+            throw CloudError.message("Drive did not return a folder id.")
+        }
+        return CloudFolder(id: id, name: created["name"] as? String ?? name)
     }
 
     // MARK: - Auth
