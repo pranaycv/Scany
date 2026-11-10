@@ -1,6 +1,20 @@
+<p align="center">
+  <img src="website/assets/github-banner.png" alt="Scany" width="720">
+</p>
+
 # Scany
 
-Native **iPhone** document scanner. Point the camera at a page, hold still, and Scany detects the paper (any orientation), waits until the quad is stable, auto-captures, straightens the perspective, and keeps scanning until you tap **Done**.
+Privacy-first document scanner for iPhone. Point the camera at a page, hold still, and Scany detects the paper in any orientation, waits until the shot is steady, auto-captures, straightens the perspective, and saves a PDF to **your** Google Drive or iCloud. There is no Scany account and no Scany server. Pages are processed on the phone.
+
+Version **1.0** is approved and is being published on the App Store. Product site: [scany.eyesrhythm.com](https://scany.eyesrhythm.com). Privacy: [scany.eyesrhythm.com/privacy](https://scany.eyesrhythm.com/privacy).
+
+<p align="center">
+  <img src="website/assets/github-collage.png" alt="Scany on iPhone: home, live scan, enhance, crop, save, and cloud settings" width="920">
+</p>
+
+The source in this tree is under the [PolyForm Noncommercial License 1.0.0](https://polyformproject.org/licenses/noncommercial/1.0.0). You may use, modify, and share it for a noncommercial purpose, provided you keep `LICENSE` and the required notice below. Commercial use is not included. Third-party libraries keep their own licenses. See [`THIRD_PARTY_NOTICES.md`](THIRD_PARTY_NOTICES.md).
+
+Required Notice: Copyright Pranay Soni (https://github.com/pranaycv)
 
 This is a custom **AVFoundation + Vision + Core Image** pipeline — not a wrapper around `VNDocumentCameraViewController` — so stabilize-then-auto-capture and continuous multi-page scanning work the way the product requires.
 
@@ -116,7 +130,9 @@ Scans live in a **Google Drive** or **iCloud Drive** folder you choose. Settings
 
 Review’s primary button is **Save to Drive** / **Save to iCloud** (or a chooser if both are connected). Share sheet is secondary.
 
-Until you add a real Google OAuth client ID, **Connect Drive** still works: files are written to the app sandbox under `Documents/CloudUploadSimulation/`. iCloud uses the real iCloud account on a device; Simulator falls back to the sandbox if iCloud is signed out.
+The iOS OAuth client ID in `CloudConfig.swift` is the public client for the shipped app, bundle ID `com.prnysoni.Scany`. An iOS client has no secret; Google restricts it to that bundle ID. A fork that changes the bundle ID needs its own client. Do not commit a client secret, refresh token, or service-account key.
+
+If `Google.clientID` still starts with `YOUR_`, **Connect Drive** writes files to the app sandbox under `Documents/CloudUploadSimulation/`. iCloud uses the real iCloud account on a device; Simulator falls back to the sandbox if iCloud is signed out.
 
 Privacy policy (App Store + Google consent): https://scany.eyesrhythm.com/privacy
 
@@ -167,4 +183,12 @@ Google auth uses the official SDK when the package is linked (`#if canImport`). 
 - Torch is available on the scan screen for dim rooms.
 - Tap the preview to focus/expose on that point.
 - Auto-enhance is a **document-level** switch. New pages captured after you turn it on are enhanced automatically.
+
+## License
+
+Scany’s own code is under the [PolyForm Noncommercial License 1.0.0](LICENSE), the same terms as [EyesRhythm](https://github.com/pranaycv/EyeRhythm). Noncommercial use, modification, and sharing are allowed if you keep `LICENSE` and this notice. Commercial use is not included.
+
+Required Notice: Copyright Pranay Soni (https://github.com/pranaycv)
+
+Questions: [prnysoni@gmail.com](mailto:prnysoni@gmail.com). Security reports go to the same address. See [`SECURITY.md`](SECURITY.md).
 

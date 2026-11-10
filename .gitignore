@@ -36,6 +36,7 @@ segmentation-experiment/models/
 segmentation-experiment/review/
 segmentation-experiment/review_*/
 segmentation-experiment/runs/
+segmentation-experiment/Train/
 segmentation-experiment/__pycache__/
 segmentation-experiment/**/__pycache__/
 *.safetensors

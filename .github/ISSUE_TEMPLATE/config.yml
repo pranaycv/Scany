@@ -1,0 +1,8 @@
+blank_issues_enabled: true
+contact_links:
+  - name: Security report
+    url: https://github.com/pranaycv/Scany/security/policy
+    about: Report a vulnerability by email. Please do not file a public issue.
+  - name: Product site
+    url: https://scany.eyesrhythm.com
+    about: Privacy policy, support, and terms.
